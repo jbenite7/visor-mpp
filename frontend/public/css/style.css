@@ -1,0 +1,94 @@
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --bg-color: #f8fafc;
+  --card-bg: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --radius: 12px;
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: --bg-color;
+  color: var(--text-main);
+  line-height: 1.5;
+  background: linear-gradient(to bottom, #f0f9ff, #e0f2fe);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+.app-header {
+  background: var(--card-bg);
+  padding: 1.5rem 0;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.upload-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.drop-zone {
+  background: var(--card-bg);
+  border: 2px dashed var(--primary-color);
+  border-radius: var(--radius);
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 500px;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+  background-color: #eff6ff;
+  transform: scale(1.02);
+}
+
+.icon-container svg {
+  width: 48px;
+  height: 48px;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.hidden {
+  display: none;
+}
+
+.status-indicator {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 1rem;
+}
+
+/* Mobile First Adjustments */
+@media (min-width: 768px) {
+  .app-header h1 {
+    font-size: 2rem;
+  }
+}
