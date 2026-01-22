@@ -14,5 +14,6 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Estructura inicial del proyecto (Scaffolding).
 - Configuración de Docker para entorno de desarrollo.
 - Documentación base (README, SCAFFOLDING, GEMINI).
+- **ROADMAP.md**: Estrategia de desarrollo detallada por fases.
 - Configuración de VSCode y Linters.
 - "Hello World" frontend y endpoint de salud backend.
