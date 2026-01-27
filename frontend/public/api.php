@@ -1,4 +1,10 @@
 <?php
+// Aumentar límites para archivos XML grandes
+ini_set('upload_max_filesize', '64M');
+ini_set('post_max_size', '64M');
+ini_set('memory_limit', '256M');
+ini_set('max_execution_time', '120');
+
 header('Content-Type: application/json; charset=utf-8');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE");
@@ -136,6 +142,37 @@ if ($action === 'delete_group' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+// Save/Update an existing project
+if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $input = file_get_contents('php://input');
+        $data = json_decode($input, true);
+
+        if (!$data || !isset($data['id'])) {
+            throw new Exception("Datos inválidos");
+        }
+
+        $id = (int)$data['id'];
+        $storage = new ProjectStorage();
+
+        // Use saveProject with overwriteId to update
+        // The data structure received from frontend must match what saveProject expects
+        // Frontend sends: { id: ..., project: ..., tasks: ..., resources: ... }
+        // saveProject expects: { project: ..., tasks: ..., resources: ... }
+
+        // We might need to fetch the existing name if not provided in data['project']['name']
+        // valid since my saveProject handles name extraction
+
+        $storage->saveProject($data, '', $id);
+
+        echo json_encode(['status' => 'success']);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
 // Duplicate a project (Copy or Version)
 if ($action === 'duplicate' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -250,7 +287,8 @@ if ($action === 'upload' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode([
             'status' => 'success',
             'projectId' => $projectId,
-            'data' => $data
+            // Inject ID into data so frontend has it immediately
+            'data' => array_merge($dataArray, ['project' => array_merge($dataArray['project'], ['id' => $projectId])])
         ]);
     } catch (Exception $e) {
         http_response_code(500);

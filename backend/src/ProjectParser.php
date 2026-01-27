@@ -32,9 +32,9 @@ class ProjectParser
             foreach ($xml->Resources->Resource as $res) {
                 if ((string)$res->Name === '') continue;
                 $data->resources[] = [
-                    'id' => (int)$res->UID,
-                    'name' => (string)$res->Name,
-                    'type' => (int)$res->Type
+                    'UID' => (int)$res->UID,
+                    'Name' => (string)$res->Name,
+                    'Type' => (int)$res->Type
                 ];
             }
         }
@@ -76,14 +76,26 @@ class ProjectParser
                     }
                 }
 
-                // Procesar predecesoras
-                $predecessors = [];
+                // Procesar predecesoras con detalles completos
+                $predecessorLinks = [];
+                $simplePredecessors = []; // Array simple de IDs para compatibilidad
+
                 if (isset($task->PredecessorLink)) {
                     foreach ($task->PredecessorLink as $link) {
-                        $predecessors[] = (int)$link->PredecessorUID;
+                        $uid = (int)$link->PredecessorUID;
+                        $simplePredecessors[] = $uid;
+
+                        $predecessorLinks[] = [
+                            'PredecessorUID' => $uid,
+                            'Type' => (int)($link->Type ?? 1),
+                            'LinkLag' => (int)($link->LinkLag ?? 0),
+                            'LagFormat' => (int)($link->LagFormat ?? 7)
+                        ];
                     }
                 }
-                $taskData['predecessors'] = $predecessors;
+
+                $taskData['PredecessorLink'] = $predecessorLinks;
+                $taskData['predecessors'] = $simplePredecessors;
 
                 // Campos calculados/normalizados para compatibilidad
                 $taskData['id'] = $taskData['UID'] ?? 0;
