@@ -15,6 +15,26 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - **Bug de campos faltantes en carga desde DB**: Corregida inconsistencia entre el parser XML y el método `getProject()` de `ProjectStorage`.
 - **Bug de campos faltantes en carga desde DB**: Corregida inconsistencia entre el parser XML y el método `getProject()` de `ProjectStorage`.
 
+## [0.4.0] - 2026-01-27
+
+### Agregado
+
+- Adopción Total de Identidad de Marca AIA ("manual-de-marca-aia.json").
+- Implementación de variables CSS semánticas para Colores Corporativos, Alertas y Advertencias.
+- Función `scrollToStart` en Gantt para posicionamiento inicial inteligente.
+
+### Modificado
+
+- `style.css`: Reescritura completa usando variables CSS `--aia-*`.
+- `app.js`: Ajuste de scroll inicial y fecha de corte por defecto (Hoy).
+- `index.php`: Limpieza de scripts obsoletos.
+
+### Eliminado / Archivado
+
+- `backend/src/parser.py`: Eliminado por obsolescencia.
+- Archivos de prueba movidos a `test_data/` y scripts experimentales a `_experimental/`.
+- Limpieza de archivos XML de la raíz.
+
 ## [0.3.0] - 2026-01-27
 
 ### Added
