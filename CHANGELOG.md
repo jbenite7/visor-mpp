@@ -7,15 +7,28 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Added
+
+- **Favicon y Logo Corporativo**: Integración de `favicon.png` y `logo.png` en la interfaz principal.
+- **Curvas Suaves en Flechas de Dependencias**: Implementación de curvas bezier (radio 8px) para paths SVG de dependencias, mejorando la estética visual.
+
 ### Changed
 
+- **Refactorización de Renderizado**: Simplificación de lógica de `renderTable` y `renderGantt` para mayor mantenibilidad.
+- **Top Bar Mejorado**: Refinamiento de estilos del `main-top-bar` con mejor alineación y espaciado utilizando flexbox y gap.
 - **Reorganización del Proyecto**: El proyecto fue movido a un directorio independiente: `/Developer/visor-gantt`.
 - **Docker - DocumentRoot Dinámico**: Se configuró Apache para leer la variable de entorno `APACHE_DOCUMENT_ROOT` dinámicamente, eliminando rutas hardcodeadas.
 - **Docker Compose**: Removida declaración obsoleta `version: '3.8'` (no requerida desde Docker Compose v2+).
 
 ### Fixed
 
+- **Referencias DOM**: Corrección de referencias a elementos del DOM en `app.js` (eliminación de código obsoleto de vista dividida).
 - **Exclusión de Logs**: Añadido `backend/debug_log.txt` al `.gitignore` para evitar trackear archivos de depuración.
+
+### Removed
+
+- **Vista "Tabla + Gantt" Temporal**: Removida temporalmente la vista dividida para estabilización (pendiente de reintegración).
+- **fixGanttDateRange**: Deshabilitada función que causaba desalineación de barras al sobrescribir fechas calculadas por Frappe Gantt.
 
 ## [0.5.0] - 2026-01-29
 
