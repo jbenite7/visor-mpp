@@ -1287,6 +1287,8 @@ function renderGantt(tasks) {
       // Use additional delay to ensure Frappe's render cycle completes
       setTimeout(() => {
         fixMonthViewBarPositions(); // Fix bar positions for Month view (30-day bug)
+        fixBarLabels(); // Fix label classes for ALL views (unify styles)
+
         // Reveal chart only after all corrections are applied
         requestAnimationFrame(() => {
           ganttContainer.style.opacity = 1;
@@ -1387,6 +1389,8 @@ function changePViewMode(mode) {
       // fixMonthViewBarPositions must run AFTER any possible refresh from fixGanttDateRange
       setTimeout(() => {
         fixMonthViewBarPositions(); // Fix bar positions for Month view (30-day bug)
+        fixBarLabels(); // Fix label classes for ALL views
+        bindTooltipHover(); // Re-bind popups after view mode change
       }, 150);
     }, 300);
 
@@ -1427,6 +1431,7 @@ function toggleGanttFullscreen() {
           alignTaskLabels();
           renderPreStartZone();
           scrollToStart();
+          bindTooltipHover(); // Re-bind popups after fullscreen toggle
 
           requestAnimationFrame(() => {
             ganttContainer.style.opacity = 1;
@@ -1453,6 +1458,7 @@ function toggleGanttFullscreen() {
           alignTaskLabels();
           renderPreStartZone();
           scrollToStart();
+          bindTooltipHover(); // Re-bind popups after fullscreen toggle
 
           requestAnimationFrame(() => {
             ganttContainer.style.opacity = 1;
@@ -1766,6 +1772,12 @@ function fixGanttDateRange() {
     if (gantt.options.view_mode === "Month") {
       setTimeout(() => {
         fixMonthViewBarPositions();
+        bindTooltipHover(); // Re-bind popups after Month view refresh
+      }, 100);
+    } else {
+      // For Day/Week views, also re-bind after refresh
+      setTimeout(() => {
+        bindTooltipHover(); // Re-bind popups after Day/Week refresh
       }, 100);
     }
   }
@@ -1880,28 +1892,10 @@ function fixMonthViewBarPositions() {
       progressHandle.setAttribute("cx", newX + progressWidth);
     }
 
-    // Update label position - Determine if label fits inside the bar
+    // Update label position (using improved logic)
     const label = wrapper.querySelector(".bar-label");
     if (label) {
-      const labelText = label.textContent || "";
-      // Estimate text width: ~7px per character average
-      const estimatedTextWidth = labelText.length * 7;
-      const padding = 10; // 5px on each side
-
-      // Label fits inside if bar is wide enough for text + padding
-      const fitsInside = newWidth > estimatedTextWidth + padding;
-
-      if (fitsInside) {
-        // Position inside: at start of bar + small padding
-        label.setAttribute("x", newX + 5);
-        label.classList.add("big");
-        label.classList.remove("small");
-      } else {
-        // Position outside: after end of bar
-        label.setAttribute("x", newX + newWidth + 5);
-        label.classList.add("small");
-        label.classList.remove("big");
-      }
+      fixSingleLabel(label, newX, newWidth);
     }
 
     // Store corrected positions for arrow recalculation
@@ -1921,6 +1915,52 @@ function fixMonthViewBarPositions() {
   console.log(
     "[fixMonthViewBarPositions] Corrected bar positions, labels, and arrows for Month view",
   );
+}
+
+// ==== General Label Operations ====
+
+// Helper to fix a single label based on position X and Width
+function fixSingleLabel(label, x, width) {
+  const labelText = label.textContent || "";
+  // Estimate text width: ~7px per character average
+  const estimatedTextWidth = labelText.length * 7;
+  const padding = 12; // 6px on each side
+
+  // Label fits inside if bar is wide enough for text + padding
+  const fitsInside = width > estimatedTextWidth + padding;
+
+  if (fitsInside) {
+    // Position inside: at start of bar + small padding
+    label.setAttribute("x", x + 5);
+    label.classList.add("big");
+    label.classList.remove("small");
+  } else {
+    // Position outside: after end of bar
+    label.setAttribute("x", x + width + 5);
+    label.classList.add("small");
+    label.classList.remove("big");
+  }
+}
+
+// Fix labels for ALL views (Day, Week, Month)
+function fixBarLabels() {
+  const gantt = window.ganttInstance;
+  // If Month view, we let fixMonthViewBarPositions handle it to avoid conflicts
+  if (gantt && gantt.options.view_mode === "Month") return;
+
+  const barWrappers = document.querySelectorAll(".bar-wrapper");
+
+  barWrappers.forEach((wrapper) => {
+    const bar = wrapper.querySelector(".bar");
+    const label = wrapper.querySelector(".bar-label");
+
+    if (bar && label) {
+      const x = parseFloat(bar.getAttribute("x")) || 0;
+      const width = parseFloat(bar.getAttribute("width")) || 0;
+      fixSingleLabel(label, x, width);
+    }
+  });
+  console.log("[fixBarLabels] Updated label classes for current view");
 }
 
 // ==== Fix Month View Arrows (Dependency Lines) ====

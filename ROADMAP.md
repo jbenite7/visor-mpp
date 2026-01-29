@@ -91,3 +91,14 @@
 
 - [x] 74 funciones en `app.js` — Todas en uso activo
 - [x] 11 métodos en backend PHP (`ProjectParser`, `ProjectStorage`) — Todos en uso activo
+
+## ✅ Fase 13: Fix de Popups en Vistas Gantt (Completada)
+
+**Problema**: Los popups/tooltips de las barras Gantt dejaban de funcionar después de cambiar el modo de vista (Día/Semana/Mes) o al entrar/salir de pantalla completa.
+
+**Causa**: La función `bindTooltipHover()` que vincula los event listeners de hover solo se ejecutaba al renderizar inicialmente el Gantt, pero no después de cambiar de vista. Frappe Gantt re-renderiza las barras al cambiar de modo, perdiendo los event listeners.
+
+**Solución**:
+
+- [x] Añadido `bindTooltipHover()` en `changePViewMode()` después del setTimeout interno
+- [x] Añadido `bindTooltipHover()` en ambos bloques de `toggleGanttFullscreen()` (entrar y salir)
