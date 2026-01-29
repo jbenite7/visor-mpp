@@ -118,6 +118,16 @@ class ProjectStorage
                     ];
                 }, $predecessorsRaw);
 
+                // RECALCULATE isMilestone at runtime (fix for existing projects):
+                // Milestone = true if:
+                // 1. DB says is_milestone = true, OR
+                // 2. Start date == Finish date (comparing DATE portion only, ignoring time)
+                $dbMilestone = (bool)$t['is_milestone'];
+                $startDate = substr($t['start_date'] ?? '', 0, 10);
+                $finishDate = substr($t['finish_date'] ?? '', 0, 10);
+                $zeroDurationMilestone = ($startDate !== '' && $startDate === $finishDate);
+                $isMilestone = $dbMilestone || $zeroDurationMilestone;
+
                 // Map DB columns to MSPDI/Frontend expected keys
                 $baseData = [
                     // Uppercase keys (MSPDI/XML standard)
@@ -133,7 +143,7 @@ class ProjectStorage
                     'PercentComplete' => $t['percent_complete'],
                     'Summary' => $t['is_summary'] ? 1 : 0,
                     'Critical' => $extraData['Critical'] ?? 0, // Fallback to extra_data or 0
-                    'Milestone' => $t['is_milestone'] ? 1 : 0,
+                    'Milestone' => $isMilestone ? 1 : 0,
 
                     // Frontend compatibility
                     'id' => $t['uid'],
@@ -145,7 +155,7 @@ class ProjectStorage
                     'duration' => $t['duration'],
                     'percentComplete' => $t['percent_complete'],
                     'isSummary' => $t['is_summary'],
-                    'isMilestone' => $t['is_milestone'],
+                    'isMilestone' => $isMilestone,
                     'predecessors' => $predecessorsUIDs,
                     'PredecessorLink' => $predecessorLinks
                 ];

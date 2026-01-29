@@ -691,23 +691,29 @@ function renderProject(data) {
   );
 
   resultsSection.innerHTML = `
-    <div class="results-header">
-      <div class="header-left">
-        <button class="btn-back" onclick="location.reload()">← Subir otro</button>
-      </div>
-      <div class="view-toggle">
-        <button id="btn-table" class="toggle-btn active" onclick="showView('table')">Tabla</button>
-        <button id="btn-gantt" class="toggle-btn" onclick="showView('gantt')">Gantt</button>
-        <button id="btn-columns" class="toggle-btn" onclick="toggleColumnSelector()">⚙ Columnas</button>
-        <button class="toggle-btn btn-export" onclick="exportToExcel()" title="Descargar como Excel">📥 Descargar</button>
-      </div>
+    <!-- [GREEN] Single Toolbar Row -->
+    <div class="toolbar-row">
+        <div class="toolbar-left">
+            <button class="btn-back" onclick="location.reload()">← Subir otro</button>
+        </div>
+        
+        <div class="toolbar-right view-toggle">
+            <button id="btn-table" class="toggle-btn active" onclick="showView('table')">Tabla</button>
+            <button id="btn-gantt" class="toggle-btn" onclick="showView('gantt')">Gantt</button>
+            <button id="btn-columns" class="toggle-btn" onclick="toggleColumnSelector()">⚙ Columnas</button>
+            <button class="toggle-btn btn-export" onclick="exportToExcel()" title="Descargar como Excel">📥 Descargar</button>
+        </div>
     </div>
-    <div class="project-header">
-      <h2>${data.project.name || "Proyecto"}</h2>
-      <div class="project-meta">
-        <span>Inicio: ${formatDate(data.project.startDate)}</span>
-        <span>Fin: ${formatDate(data.project.finishDate)}</span>
-        <span>Tareas: ${data.tasks.length}</span>
+
+    <!-- [BLUE] Compact Project Header -->
+    <div class="project-header-compact">
+      <h3>${data.project.name || "Proyecto"}</h3>
+      <div class="project-meta-compact">
+        <span><strong>Inicio:</strong> ${formatDate(data.project.startDate)}</span>
+        <span class="meta-divider">|</span>
+        <span><strong>Fin:</strong> ${formatDate(data.project.finishDate)}</span>
+        <span class="meta-divider">|</span>
+        <span><strong>Tareas:</strong> ${data.tasks.length}</span>
       </div>
     </div>
     
@@ -1202,6 +1208,7 @@ function renderGantt(tasks) {
       view_mode: "Week",
       date_format: "YYYY-MM-DD",
       language: "es",
+      popup_trigger: "mouseover", // Hover trigger
       custom_popup_html: function (task) {
         // Calculate Theoretical Progress
         const dateInput = document.getElementById("cutoff-date");
@@ -1266,15 +1273,26 @@ function renderGantt(tasks) {
 
     // Render initial line and fix visuals
     setTimeout(() => {
+      fixGanttDateRange(); // Fix Frappe's absurd date calculations (especially Month view)
+
+      // Apply other visual fixes (these don't depend on refresh timing)
       renderCutoffLine();
       fixMilestoneShapes(); // Fix diamonds
+      alignTaskLabels(); // Fix text alignment (Left)
+      renderPreStartZone();
       scrollToStart(); // Scroll to project start
+      bindTooltipHover(); // Enable custom hover logic for popups
 
-      // Reveal chart
-      requestAnimationFrame(() => {
-        ganttContainer.style.opacity = 1;
-      });
-    }, 100); // 100ms allows the library to maximize dimensions/render before we scroll
+      // fixMonthViewBarPositions must run AFTER any possible refresh from fixGanttDateRange
+      // Use additional delay to ensure Frappe's render cycle completes
+      setTimeout(() => {
+        fixMonthViewBarPositions(); // Fix bar positions for Month view (30-day bug)
+        // Reveal chart only after all corrections are applied
+        requestAnimationFrame(() => {
+          ganttContainer.style.opacity = 1;
+        });
+      }, 150);
+    }, 300); // Increased to 300ms to ensure flex layout settles
 
     applyScrollLock();
   } catch (e) {
@@ -1359,8 +1377,17 @@ function changePViewMode(mode) {
   if (window.ganttInstance) {
     window.ganttInstance.change_view_mode(mode);
     setTimeout(() => {
+      fixGanttDateRange(); // Fix date range before other calculations
       renderCutoffLine();
       fixMilestoneShapes();
+      alignTaskLabels();
+      renderPreStartZone();
+      scrollToStart(); // Realign to project start date
+
+      // fixMonthViewBarPositions must run AFTER any possible refresh from fixGanttDateRange
+      setTimeout(() => {
+        fixMonthViewBarPositions(); // Fix bar positions for Month view (30-day bug)
+      }, 150);
     }, 300);
 
     // Update active button state
@@ -1385,19 +1412,52 @@ function toggleGanttFullscreen() {
     container.classList.add("fullscreen-mode");
     btn.textContent = "✕ Salir";
     // Force redraw significantly later to ensure transition finishes
+    // Hide to avoid jump
+    const ganttContainer = document.getElementById("gantt-chart");
+    ganttContainer.style.opacity = 0;
+
     setTimeout(() => {
       if (window.ganttInstance) {
         window.ganttInstance.refresh(window.ganttInstance.tasks);
-        setTimeout(renderCutoffLine, 100);
+
+        // Re-apply all visual fixes
+        setTimeout(() => {
+          renderCutoffLine();
+          fixMilestoneShapes();
+          alignTaskLabels();
+          renderPreStartZone();
+          scrollToStart();
+
+          requestAnimationFrame(() => {
+            ganttContainer.style.opacity = 1;
+          });
+        }, 100);
       }
     }, 300);
   } else {
     container.classList.remove("fullscreen-mode");
     btn.textContent = "⛶ Pantalla Completa";
+
+    // Hide to avoid jump
+    const ganttContainer = document.getElementById("gantt-chart");
+    ganttContainer.style.opacity = 0;
+
     setTimeout(() => {
       if (window.ganttInstance) {
         window.ganttInstance.refresh(window.ganttInstance.tasks);
-        setTimeout(renderCutoffLine, 100);
+
+        // Re-apply all visual fixes
+        setTimeout(() => {
+          renderCutoffLine();
+          fixMilestoneShapes();
+          alignTaskLabels();
+          renderPreStartZone();
+          scrollToStart();
+
+          requestAnimationFrame(() => {
+            ganttContainer.style.opacity = 1;
+          });
+        }, 100);
       }
     }, 300);
   }
@@ -1485,17 +1545,23 @@ function renderCutoffLine() {
   // We will calculate Offset Days from gantt_start
   const daysFromStart = diffHours / 24;
 
-  // Width per day
-  let widthPerDay = 0;
-  if (gantt.options.view_mode === "Day") {
-    widthPerDay = gantt.options.column_width;
-  } else if (gantt.options.view_mode === "Week") {
-    widthPerDay = gantt.options.column_width / 7;
-  } else if (gantt.options.view_mode === "Month") {
-    widthPerDay = gantt.options.column_width / 30;
+  // Width per day - Use correct calendar calculation for Month view
+  if (gantt.options.view_mode === "Month") {
+    // Use calendar-accurate calculation for Month view
+    x = getXForDateInMonthView(
+      cutoffDate,
+      gantt.gantt_start,
+      gantt.options.column_width,
+    );
+  } else {
+    let widthPerDay = 0;
+    if (gantt.options.view_mode === "Day") {
+      widthPerDay = gantt.options.column_width;
+    } else if (gantt.options.view_mode === "Week") {
+      widthPerDay = gantt.options.column_width / 7;
+    }
+    x = daysFromStart * widthPerDay;
   }
-
-  x = daysFromStart * widthPerDay;
 
   // Adjust for padding usually in Frappe GS
   // Side padding is commonly applied to grid
@@ -1562,6 +1628,68 @@ function fixMilestoneShapes() {
   });
 }
 
+// ==== Enable Hover Tooltips (Custom Implementation) ====
+function bindTooltipHover() {
+  const gantt = window.ganttInstance;
+  if (!gantt) return;
+
+  const bars = document.querySelectorAll(".bar-group");
+  bars.forEach((bar) => {
+    // Find task ID usually stored in data attribute or derive from index
+    // Frappe usually stores task info bound to the element or reachable via ID
+    // Simplified: use the bar-group click handler logic if possible, OR
+    // Use the index from the list if they are in order (risky).
+
+    // Better: Frappe attaches the task object to the bar element in some versions.
+    // If not, we can rely on the fact that `gantt.tasks` matches the DOM order usually.
+    // Or look for `data-id` on `.task-bar`.
+
+    const taskBar = bar.querySelector(".bar, .progress-bar, .test");
+    // We can just trigger the existing click handler? No, that might toggle/lock.
+
+    bar.addEventListener("mouseover", (e) => {
+      // Find the task based on the index or data-id
+      // Let's rely on Frappe's internal method if accessible,
+      // OR find the closest .bar-wrapper data-id.
+      const wrapper = bar.closest(".bar-wrapper");
+      const taskId = wrapper ? wrapper.getAttribute("data-id") : null;
+      if (taskId) {
+        // CRITICAL: show_popup expects the BAR object, not the TASK object!
+        const barObj = gantt.get_bar(taskId);
+        if (barObj) {
+          // Cancel any pending hide
+          if (window._popupHideTimeout) {
+            clearTimeout(window._popupHideTimeout);
+            window._popupHideTimeout = null;
+          }
+          gantt.show_popup(barObj);
+        }
+      }
+    });
+
+    // Hide popup when mouse leaves the bar (with delay to allow popup hover)
+    bar.addEventListener("mouseleave", () => {
+      window._popupHideTimeout = setTimeout(() => {
+        gantt.hide_popup();
+      }, 150); // Small delay to allow cursor to reach popup
+    });
+  });
+
+  // Also keep popup open if hovering over the popup itself
+  const popupWrapper = document.querySelector(".popup-wrapper");
+  if (popupWrapper) {
+    popupWrapper.addEventListener("mouseenter", () => {
+      if (window._popupHideTimeout) {
+        clearTimeout(window._popupHideTimeout);
+        window._popupHideTimeout = null;
+      }
+    });
+    popupWrapper.addEventListener("mouseleave", () => {
+      gantt.hide_popup();
+    });
+  }
+}
+
 // Initial Listener to set date input default
 document.addEventListener("DOMContentLoaded", () => {
   const today = new Date();
@@ -1570,44 +1698,481 @@ document.addEventListener("DOMContentLoaded", () => {
   const dd = String(today.getDate()).padStart(2, "0");
   const todayStr = `${yyyy}-${mm}-${dd}`;
 
-  const dateInput = document.getElementById("cutoff-date");
   if (dateInput) {
     // dateInput.value = todayStr; // Disable default today
     dateInput.addEventListener("change", renderCutoffLine);
   }
 });
 
-// ==== Auto Scroll Logic ====
-function scrollToStart() {
-  const container = document.querySelector(".gantt-container");
-  if (!container) return;
+// ==== Helper: Cross-Browser Date Parsing ====
+function parseSafeDate(dateStr) {
+  if (!dateStr) return new Date(); // Fallback
+  // Handle "YYYY-MM-DD HH:mm:ss" (common in SQL/MPP exports)
+  // Edge/Safari fail on space separator, Chrome accepts it.
+  if (typeof dateStr === "string" && dateStr.includes(" ")) {
+    dateStr = dateStr.replace(" ", "T");
+  }
+  return new Date(dateStr);
+}
 
-  // Strategy: Iterate over all bars to find the minimum X position
-  const bars = container.querySelectorAll(".bar");
-  if (bars.length === 0) return;
+// ==== Fix Gantt Date Range (Frappe Month View Bug Workaround) ====
+// Frappe Gantt in Month view calculates absurd gantt_start dates (e.g., 2.5 years before tasks).
+// This function forces a tighter date range based on actual task dates + padding.
+function fixGanttDateRange() {
+  const gantt = window.ganttInstance;
+  if (!gantt || !gantt.tasks || gantt.tasks.length === 0) return;
 
-  let minX = Infinity;
+  // Find actual min/max task dates
+  let minDate = null;
+  let maxDate = null;
 
-  bars.forEach((bar) => {
-    let x = parseFloat(bar.getAttribute("x"));
+  gantt.tasks.forEach((task) => {
+    const start = task._start || parseSafeDate(task.start);
+    const end = task._end || parseSafeDate(task.end);
 
-    // Fallback for milestones or groups using transforms if X is missing
-    if (isNaN(x)) {
-      const rect = bar.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      // Calculate relative X based on current scroll
-      x = container.scrollLeft + (rect.left - containerRect.left);
-    }
-
-    if (!isNaN(x) && x < minX) {
-      minX = x;
-    }
+    if (!minDate || start < minDate) minDate = start;
+    if (!maxDate || end > maxDate) maxDate = end;
   });
 
-  if (minX !== Infinity) {
-    // Scroll to Minimum X - 50px padding to show the start clearly
-    // But ensure we don't scroll into negative (before start of chart)
-    container.scrollLeft = Math.max(0, minX - 50);
-    console.log("Auto-scrolled Gantt to X:", minX);
+  if (!minDate || !maxDate) return;
+
+  // Add padding: 1 month before min, 1 month after max
+  const paddedStart = new Date(minDate);
+  paddedStart.setMonth(paddedStart.getMonth() - 1);
+  paddedStart.setDate(1); // Start of month for cleaner alignment
+
+  const paddedEnd = new Date(maxDate);
+  paddedEnd.setMonth(paddedEnd.getMonth() + 2);
+  paddedEnd.setDate(0); // End of month
+
+  // Only override if Frappe's calculation is wildly off
+  const currentStart = gantt.gantt_start;
+  const diffDays = (minDate - currentStart) / (1000 * 60 * 60 * 24);
+
+  // If Frappe's start is more than 60 days before our min task, it's probably wrong
+  if (diffDays > 60) {
+    console.log(
+      `[fixGanttDateRange] Correcting gantt_start from ${currentStart.toISOString()} to ${paddedStart.toISOString()}`,
+    );
+    gantt.gantt_start = paddedStart;
+    gantt.gantt_end = paddedEnd;
+
+    // Force re-render to apply new date bounds
+    // Note: This is heavy, but necessary for correct positioning
+    gantt.refresh(gantt.tasks);
+
+    // Apply Month view bar position fix AFTER refresh completes
+    // The refresh is asynchronous so we need a delay
+    if (gantt.options.view_mode === "Month") {
+      setTimeout(() => {
+        fixMonthViewBarPositions();
+      }, 100);
+    }
   }
+}
+
+// ==== Helper: Calculate X Position for Month View (Uses Real Calendar Days) ====
+// This function calculates accurate X positions for Month view by using
+// actual days in each month instead of Frappe's fixed 30-day assumption.
+function getXForDateInMonthView(targetDate, ganttStart, columnWidth) {
+  if (!targetDate || isNaN(targetDate.getTime())) return 0;
+  if (!ganttStart || isNaN(ganttStart.getTime())) return 0;
+
+  // Calculate months difference
+  let monthsDiff =
+    (targetDate.getFullYear() - ganttStart.getFullYear()) * 12 +
+    (targetDate.getMonth() - ganttStart.getMonth());
+
+  // Calculate fraction within the target month
+  const daysInTargetMonth = new Date(
+    targetDate.getFullYear(),
+    targetDate.getMonth() + 1,
+    0,
+  ).getDate();
+
+  const dayOfMonth = targetDate.getDate() - 1; // 0-indexed day within month
+  const fractionOfMonth = dayOfMonth / daysInTargetMonth;
+
+  // Handle first month offset (if gantt_start is not on the 1st)
+  let firstMonthOffset = 0;
+  if (ganttStart.getDate() > 1) {
+    const daysInGanttStartMonth = new Date(
+      ganttStart.getFullYear(),
+      ganttStart.getMonth() + 1,
+      0,
+    ).getDate();
+    firstMonthOffset = (ganttStart.getDate() - 1) / daysInGanttStartMonth;
+  }
+
+  // Total X = (complete_months * column_width) + (fraction * column_width) - first_month_offset
+  const x = (monthsDiff + fractionOfMonth - firstMonthOffset) * columnWidth;
+
+  return Math.max(0, x);
+}
+
+// ==== Fix Month View Bar Positions (Critical Bug Fix) ====
+// Frappe Gantt calculates X positions using 30 fixed days per month,
+// but months have 28-31 days. This causes progressive misalignment.
+// This function recalculates bar X and width using actual calendar days.
+function fixMonthViewBarPositions() {
+  const gantt = window.ganttInstance;
+  if (!gantt || gantt.options.view_mode !== "Month") return;
+
+  const columnWidth = gantt.options.column_width || 120;
+  const ganttStart = gantt.gantt_start;
+
+  if (!ganttStart || isNaN(ganttStart.getTime())) return;
+
+  // Use global helper for X position calculation
+  const getXPositionForDate = (date) =>
+    getXForDateInMonthView(date, ganttStart, columnWidth);
+
+  // Process all bar wrappers
+  const barWrappers = document.querySelectorAll(
+    "#gantt-chart .bar-wrapper[data-id]",
+  );
+
+  barWrappers.forEach((wrapper) => {
+    const taskId = wrapper.getAttribute("data-id");
+    const task = gantt.tasks.find((t) => String(t.id) === taskId);
+    if (!task) return;
+
+    const bar = wrapper.querySelector(".bar");
+    const progressBar = wrapper.querySelector(".bar-progress");
+    if (!bar) return;
+
+    // Get task dates
+    const taskStart = task._start || parseSafeDate(task.start);
+    const taskEnd = task._end || parseSafeDate(task.end);
+
+    if (!taskStart || !taskEnd || isNaN(taskStart.getTime())) return;
+
+    // Calculate correct positions
+    const newX = getXPositionForDate(taskStart);
+    const endX = getXPositionForDate(taskEnd);
+    const newWidth = Math.max(5, endX - newX); // Minimum 5px width
+
+    // Apply corrections
+    bar.setAttribute("x", newX);
+    bar.setAttribute("width", newWidth);
+
+    // Update progress bar position
+    if (progressBar) {
+      progressBar.setAttribute("x", newX);
+      const progress = task.progress || 0;
+      progressBar.setAttribute("width", (newWidth * progress) / 100);
+    }
+
+    // Update handles if present
+    const leftHandle = wrapper.querySelector(".handle.left");
+    const rightHandle = wrapper.querySelector(".handle.right");
+    if (leftHandle) {
+      leftHandle.setAttribute("x", newX - 1.5);
+    }
+    if (rightHandle) {
+      rightHandle.setAttribute("x", newX + newWidth - 1.5);
+    }
+
+    // Update progress handle
+    const progressHandle = wrapper.querySelector(".handle.progress");
+    if (progressHandle && progressBar) {
+      const progressWidth = parseFloat(progressBar.getAttribute("width")) || 0;
+      progressHandle.setAttribute("cx", newX + progressWidth);
+    }
+
+    // Update label position - Determine if label fits inside the bar
+    const label = wrapper.querySelector(".bar-label");
+    if (label) {
+      const labelText = label.textContent || "";
+      // Estimate text width: ~7px per character average
+      const estimatedTextWidth = labelText.length * 7;
+      const padding = 10; // 5px on each side
+
+      // Label fits inside if bar is wide enough for text + padding
+      const fitsInside = newWidth > estimatedTextWidth + padding;
+
+      if (fitsInside) {
+        // Position inside: at start of bar + small padding
+        label.setAttribute("x", newX + 5);
+        label.classList.add("big");
+        label.classList.remove("small");
+      } else {
+        // Position outside: after end of bar
+        label.setAttribute("x", newX + newWidth + 5);
+        label.classList.add("small");
+        label.classList.remove("big");
+      }
+    }
+
+    // Store corrected positions for arrow recalculation
+    window._monthViewBarPositions = window._monthViewBarPositions || {};
+    window._monthViewBarPositions[taskId] = {
+      x: newX,
+      width: newWidth,
+      endX: newX + newWidth,
+      y: parseFloat(bar.getAttribute("y")) || 0,
+      height: parseFloat(bar.getAttribute("height")) || 20,
+    };
+  });
+
+  // Fix dependency arrows
+  fixMonthViewArrows();
+
+  console.log(
+    "[fixMonthViewBarPositions] Corrected bar positions, labels, and arrows for Month view",
+  );
+}
+
+// ==== Fix Month View Arrows (Dependency Lines) ====
+// Recalculates arrow paths using corrected bar positions
+function fixMonthViewArrows() {
+  const gantt = window.ganttInstance;
+  if (!gantt || !window._monthViewBarPositions) return;
+
+  const arrows = document.querySelectorAll("#gantt-chart .arrow");
+
+  arrows.forEach((arrow) => {
+    const fromId = arrow.getAttribute("data-from");
+    const toId = arrow.getAttribute("data-to");
+
+    if (!fromId || !toId) return;
+
+    const fromPos = window._monthViewBarPositions[fromId];
+    const toPos = window._monthViewBarPositions[toId];
+
+    if (!fromPos || !toPos) return;
+
+    // Calculate arrow path
+    // Arrow goes from end of "from" bar to start of "to" bar
+    const startX = fromPos.endX;
+    const startY = fromPos.y + fromPos.height / 2;
+    const endX = toPos.x;
+    const endY = toPos.y + toPos.height / 2;
+
+    // Create new path with bezier curve or simple lines
+    let newPath;
+
+    if (endY === startY) {
+      // Same row: simple horizontal line
+      newPath = `M ${startX} ${startY} L ${endX} ${endY}`;
+    } else {
+      // Different rows: L-shaped or curved path
+      const midX = startX + 10;
+      newPath = `M ${startX} ${startY} H ${midX} V ${endY} L ${endX} ${endY}`;
+    }
+
+    arrow.setAttribute("d", newPath);
+  });
+}
+
+// Check where to scroll (Project Start)
+function scrollToStart() {
+  if (!window.ganttInstance || !window.ganttInstance.tasks) return;
+
+  const gantt = window.ganttInstance;
+  const svg = document.querySelector(".gantt-container svg");
+  if (!svg) return;
+
+  // Logic: Instead of scraping DOM for X (which might be virtualized or tricky),
+  // Calculate X based on the Start Date of the first task.
+  const firstTask = gantt.tasks[0];
+  if (!firstTask) return;
+
+  // Calculate Diff in Hours from Chart Start to First Task Start
+  // Use helper for robust cross-browser parsing
+  const firstTaskStart = parseSafeDate(firstTask._start);
+  const ganttStart = parseSafeDate(gantt.gantt_start);
+
+  const diff = firstTaskStart - ganttStart;
+  const diffHours = diff / (1000 * 60 * 60);
+
+  // Determine Width Per Day based on View Mode
+  let x = 0;
+  let bufferPixels = 0;
+  const colWidth = gantt.options.column_width;
+
+  if (gantt.options.view_mode === "Month") {
+    // Use calendar-accurate calculation for Month view
+    x = getXForDateInMonthView(firstTaskStart, ganttStart, colWidth || 120);
+    // Buffer: about 1 week worth (approximately 1/4 of a column)
+    bufferPixels = (colWidth || 120) / 4;
+  } else {
+    let widthPerDay = 38;
+    if (gantt.options.view_mode === "Week") {
+      widthPerDay = (colWidth || 140) / 7;
+    } else {
+      widthPerDay = colWidth || 38;
+    }
+    // Calculated X positions of the First Task
+    x = (diffHours / 24) * widthPerDay;
+    // Desired Buffer: 1 Week (7 days worth of pixels)
+    bufferPixels = 7 * widthPerDay;
+  }
+
+  const container = document.querySelector(".gantt-container");
+
+  // Scroll target = Task X - Buffer
+  // This ensures the first task isn't hugging the left edge.
+  const targetScroll = Math.max(0, x - bufferPixels);
+
+  // Use scrollTo for smooth behavior
+  container.scrollTo({
+    left: targetScroll,
+    behavior: "smooth",
+  });
+
+  console.log(
+    `Scrolled to ${targetScroll} (FirstTaskX=${x} - Buffer=${bufferPixels})`,
+  );
+}
+// ==== Align Labels Left ====
+function alignTaskLabels() {
+  const labels = document.querySelectorAll(".bar-label");
+  labels.forEach((label) => {
+    // We only want to align standard/summary bars, usually milestones are fine or handled separately
+    // But user asked for "bars", implying rectangular ones.
+
+    // Find parent group
+    const group = label.closest(".bar-wrapper");
+    if (!group) return;
+
+    const bar = group.querySelector(".bar");
+    if (!bar) return;
+
+    // Get bar's X position
+    const barX = parseFloat(bar.getAttribute("x"));
+    const barWidth = parseFloat(bar.getAttribute("width"));
+
+    if (isNaN(barX) || isNaN(barWidth)) return;
+
+    // Check if label fits inside?
+    // Frappe usually puts it inside if it fits, outside if not.
+    // However, SVG text length calculation is expensive.
+    // Simplest approach: Always try to put it at start + padding.
+
+    const padding = 10;
+    const newX = barX + padding;
+
+    // Force Left Alignment
+    label.setAttribute("x", newX);
+    label.setAttribute("text-anchor", "start");
+
+    // Optional: Check if text overflows bar width?
+    // If so, maybe move it back outside?
+    // User asked "Manteniendolas adentro, si caben".
+    // Frappe's default logic already decides "big" vs "small" class.
+    // If it has class "big", it means it's inside.
+
+    if (label.classList.contains("big")) {
+      label.setAttribute("x", newX);
+      label.setAttribute("text-anchor", "start");
+    }
+  });
+}
+
+// ==== Pre-Start Zone (Gray Out) ====
+function renderPreStartZone() {
+  if (
+    !window.ganttInstance ||
+    !currentProjectData ||
+    !currentProjectData.project.startDate
+  )
+    return;
+
+  const gantt = window.ganttInstance;
+
+  // Parse project start (Robust Cross-Browser)
+  const projectStart = parseSafeDate(currentProjectData.project.startDate);
+
+  // Fallback if still invalid
+  if (isNaN(projectStart.getTime())) {
+    console.warn(
+      "Invalid Project Start detected:",
+      currentProjectData.project.startDate,
+    );
+    return;
+  }
+
+  const svg = document.querySelector("#gantt-chart svg");
+
+  if (!svg || !gantt.gantt_start) return;
+
+  // Remove ALL existing pre-start zones from the CONTAINER (not SVG!)
+  // This prevents stacking of multiple overlays on view switches
+  const container = document.querySelector(".gantt-container");
+  if (container) {
+    container.querySelectorAll(".pre-start-zone").forEach((el) => el.remove());
+  }
+
+  // SAFEGUARDS
+  if (!gantt.gantt_start || isNaN(new Date(gantt.gantt_start).getTime())) {
+    // Silent return or retry
+    return;
+  }
+
+  // Check if project start is AFTER gantt start
+  if (projectStart <= gantt.gantt_start) return; // No gray zone needed
+
+  // Calculate X
+  const diff = projectStart - gantt.gantt_start;
+  const diffHours = diff / (1000 * 60 * 60);
+
+  let x = 0;
+  const colWidth = gantt.options.column_width;
+
+  if (gantt.options.view_mode === "Month") {
+    // Use calendar-accurate calculation for Month view
+    x = getXForDateInMonthView(
+      projectStart,
+      gantt.gantt_start,
+      colWidth || 120,
+    );
+  } else {
+    let widthPerDay = 38;
+    if (gantt.options.view_mode === "Day") {
+      widthPerDay = colWidth || 38;
+    } else if (gantt.options.view_mode === "Week") {
+      widthPerDay = (colWidth || 140) / 7;
+    }
+    // Days from start * width per day
+    x = (diffHours / 24) * widthPerDay;
+  }
+
+  // container already declared at line 1826 (for overlay removal), reuse it
+  if (!container) return;
+
+  // Force relative positioning
+  container.style.position = "relative";
+
+  // Get full chart height from SVG to ensure overlay covers all rows
+  const fullHeight = svg.getAttribute("height") || container.scrollHeight;
+
+  const overlay = document.createElement("div");
+  overlay.classList.add("pre-start-zone");
+  overlay.style.position = "absolute";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.height = `${fullHeight}px`; // Match full content height
+  overlay.style.width = `${Math.max(0, x)}px`;
+
+  // Robust Visuals
+  overlay.style.backgroundColor = "rgba(100, 100, 100, 0.1)";
+  overlay.style.backgroundImage = `repeating-linear-gradient(
+    45deg,
+    rgba(0,0,0,0.1),
+    rgba(0,0,0,0.1) 10px,
+    transparent 10px,
+    transparent 20px
+  )`;
+
+  overlay.style.zIndex = "50";
+  overlay.style.pointerEvents = "none";
+  overlay.style.borderRight = "2px dashed #666";
+
+  container.appendChild(overlay);
+
+  // Safe logging
+  try {
+    console.log(`Pre-Start Zone Rendered: X=${x}px from Diff=${diffHours}h`);
+  } catch (e) {}
 }

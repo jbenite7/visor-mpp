@@ -32,14 +32,7 @@
 
         <!-- Main Content -->
         <div class="main-content">
-            <header class="app-header">
-                <div class="header-left">
-                    <!-- Mobile Toggle (Only visible on mobile) -->
-                    <button id="toggle-sidebar-mobile" class="icon-btn mobile-hamburger-btn" aria-label="Abrir menú">☰</button>
-                    <h1>Visor MPP</h1>
-                </div>
-                <p>Visualiza tus proyectos de Microsoft Project al instante</p>
-            </header>
+
 
             <main class="container-fluid">
                 <section class="upload-section">

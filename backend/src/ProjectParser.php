@@ -105,7 +105,17 @@ class ProjectParser
                 $taskData['duration'] = $taskData['Duration'] ?? '';
                 $taskData['percentComplete'] = $taskData['PercentComplete'] ?? 0;
                 $taskData['isSummary'] = ($taskData['Summary'] ?? 0) === 1;
-                $taskData['isMilestone'] = ($taskData['Milestone'] ?? 0) === 1;
+
+                // Milestone Detection (Enhanced):
+                // 1. Explicit Milestone flag from MPP
+                // 2. OR if Start date == Finish date (duration 0) - compare DATE only, ignore TIME
+                $explicitMilestone = ($taskData['Milestone'] ?? 0) === 1;
+                $startDate = substr($taskData['Start'] ?? '', 0, 10); // Extract YYYY-MM-DD
+                $finishDate = substr($taskData['Finish'] ?? '', 0, 10);
+                $zeroDuration = ($startDate !== '' && $startDate === $finishDate);
+
+                $taskData['isMilestone'] = $explicitMilestone || $zeroDuration;
+
                 $taskData['outlineLevel'] = $taskData['OutlineLevel'] ?? 0;
                 $taskData['wbs'] = $taskData['WBS'] ?? '';
 

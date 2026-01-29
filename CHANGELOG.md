@@ -7,13 +7,23 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-01-29
+
 ### Fixed
 
-- **Persistencia de atributos XML**: Se implementó una columna JSONB (`extra_data`) para guardar todos los atributos del archivo MPP (como Critical, Active, etc.) que se perdían al guardar en base de datos.
-- **Persistencia de Dependencias (Gantt)**: Se corrigió el parser XML para extraer correctamente la estructura `PredecessorLink` completa. Se implementó la tabla `dependencies` y la lógica para guardar y recuperar las relaciones predecesoras, restaurando las flechas en el diagrama de Gantt.
-- **Persistencia de columnas disponibles**: Se corrigió un error donde la lista de columnas disponibles (filtros) desaparecía al recargar un proyecto guardado. Ahora se persiste en el campo `settings` del proyecto.
-- **Bug de campos faltantes en carga desde DB**: Corregida inconsistencia entre el parser XML y el método `getProject()` de `ProjectStorage`.
-- **Bug de campos faltantes en carga desde DB**: Corregida inconsistencia entre el parser XML y el método `getProject()` de `ProjectStorage`.
+- **Gantt Vista Mes - Alineación de Barras**: Corregido bug de Frappe Gantt v1.0.4 que asumía 30 días fijos por mes, causando desalineación progresiva de barras respecto a encabezados.
+  - Nueva función `getXForDateInMonthView()` que calcula posiciones usando días calendario reales.
+  - Nueva función `fixMonthViewBarPositions()` que corrige posiciones de barras post-render.
+  - Nueva función `fixMonthViewArrows()` que recalcula paths SVG de dependencias.
+  - Corrección de timing (setTimeout anidado 150ms) para ejecutar después del `gantt.refresh()`.
+  - Actualización de `renderCutoffLine()`, `scrollToStart()` y `renderPreStartZone()`.
+
+### Removed
+
+- **Código Experimental**: Eliminado directorio `frontend/public/js/_experimental/` con código no integrado:
+  - `GanttEditor.js` (126 líneas)
+  - `GanttChart.js` (98 líneas)
+  - `GanttGrid.js` (84 líneas)
 
 ## [0.4.0] - 2026-01-27
 

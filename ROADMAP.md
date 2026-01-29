@@ -63,3 +63,31 @@
 
 1.  **Exportación XLSX**: Descargar tabla con columnas activas (Soporte de tipos: Texto para EDT, Fechas dd/mm/yyyy, Booleanos Sí/No).
 2.  **Reordenamiento**: Drag & Drop para ordenar columnas (SortableJS).
+
+## ✅ Fase 11: Corrección de Fechas Gantt Vista Mes (Completada)
+
+**Problema**: Frappe Gantt v1.0.4 asumía 30 días fijos por mes en sus cálculos de posición X, causando desalineación progresiva de las barras de tareas respecto a los encabezados de mes.
+
+**Solución**:
+
+- [x] Nueva función `getXForDateInMonthView()` que calcula posiciones usando días calendario reales.
+- [x] Nueva función `fixMonthViewBarPositions()` que corrige posiciones de barras post-render.
+- [x] Nueva función `fixMonthViewArrows()` que recalcula paths SVG de dependencias.
+- [x] Corrección de labels de texto (`.bar-label`) para alinear con barras.
+- [x] Corrección de timing (setTimeout anidado de 150ms) para ejecutar después del `gantt.refresh()`.
+- [x] Actualización de `renderCutoffLine()`, `scrollToStart()` y `renderPreStartZone()` para usar cálculos corregidos.
+
+## ✅ Fase 12: Análisis de Código en Desuso (Completada)
+
+**Inventario realizado:** 2026-01-28
+
+### Código Experimental No Usado (Eliminar Recomendado)
+
+- `frontend/public/js/_experimental/GanttEditor.js` — Editor Gantt custom no integrado
+- `frontend/public/js/_experimental/GanttChart.js` — Visualización SVG no usada
+- `frontend/public/js/_experimental/GanttGrid.js` — Grid editable no usado
+
+### Funciones Activas Verificadas
+
+- [x] 74 funciones en `app.js` — Todas en uso activo
+- [x] 11 métodos en backend PHP (`ProjectParser`, `ProjectStorage`) — Todos en uso activo

@@ -1039,6 +1039,62 @@ body {
   font-weight: 500;
 }
 
+/* Labels outside bars (small class) - High contrast with background */
+.bar-label:not(.big) {
+  fill: var(--text-color) !important;
+  font-weight: 600;
+  /* Add background rectangle via filter for legibility */
+  paint-order: stroke fill;
+  stroke: white;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+/* Labels inside bars (big class) - Ensure they match bar colors */
+.bar-standard .bar-label.big {
+  fill: var(--aia-corp-dark) !important;
+  stroke: none;
+}
+
+.bar-summary .bar-label.big {
+  fill: white !important;
+  stroke: none;
+}
+
+.bar-critical .bar-label.big {
+  fill: white !important;
+  stroke: none;
+}
+
+/* High Contrast for Summary Bars - Only for INTERNAL labels */
+.bar-summary .bar-label.big {
+  fill: white !important;
+  font-weight: 600;
+  stroke: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); /* Ensure legibility */
+}
+
+/* Ensure Critical Bars also really pop - Only for INTERNAL labels */
+.bar-critical .bar-label.big {
+  fill: white !important;
+  font-weight: 600;
+  stroke: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* External labels for all bar types - Dark text with white outline */
+.bar-critical .bar-label.small,
+.bar-summary .bar-label.small,
+.bar-standard .bar-label.small,
+.bar-milestone .bar-label.small {
+  fill: var(--text-color) !important;
+  font-weight: 600;
+  paint-order: stroke fill;
+  stroke: white;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
 /* Cutoff Line */
 .cutoff-line {
   stroke: var(--aia-alert-main);
@@ -1078,4 +1134,145 @@ body {
 .bar-milestone .bar {
   rx: 0 !important;
   ry: 0 !important;
+}
+
+/* =========================================
+   NEW LAYOUT REFACTOR (v0.4.1)
+   ========================================= */
+
+/* 1. Single Toolbar Row [GREEN] */
+.toolbar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1.5rem; /* Increased Side Padding */
+  background-color: var(--aia-const-mid); /* Optional background */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  gap: 1rem;
+}
+
+.toolbar-left .btn-back {
+  /* Inherit existing btn-back styles but ensure it fits */
+  margin: 0;
+}
+
+.toolbar-right.view-toggle {
+  /* Override existing view-toggle margins if any */
+  margin: 0;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* 2. Compact Project Header [BLUE] */
+.project-header-compact {
+  padding: 0.5rem 1.5rem; /* Increased Side Padding */
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.project-header-compact h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--aia-corp-dark);
+}
+
+.project-meta-compact {
+  font-size: 0.85rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.meta-divider {
+  color: #ccc;
+}
+
+/* Upload Section needs padding because container-fluid has none now */
+.upload-section {
+  padding: 2rem;
+  flex: 1; /* Ensure it takes space */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--aia-surface-mid); /* Optional background match */
+}
+
+/* 3. Maximize Workspace [YELLOW] */
+/* We need to ensure the main container fills height */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden; /* Prevent body scroll */
+}
+
+.container-fluid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0; /* Remove padding to maximize space */
+}
+
+.results-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #f9f9f9;
+}
+
+/* View Containers must expand */
+.view-container,
+#gantt-view,
+#table-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0; /* Important for flex child scroll */
+}
+
+/* Gantt Controls (Level, Dates, Zoom) should be compact */
+.level-selector,
+.gantt-controls {
+  padding: 0.5rem 1.5rem; /* Increased side padding */
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+/* The actual chart area */
+/* The actual chart area */
+#gantt-chart {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Parent clips */
+  min-height: 0;
+  /* Add padding to the wrapper so content isn't flush */
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.gantt-container {
+  flex: 1;
+  overflow: auto; /* It scrolls */
+  height: 100% !important; /* Force fill */
+  width: 100%;
+  max-height: none !important;
+}
+
+/* Hide footer to maximize space? User didn't explicitly say hide footer but "Maximize space" usually implies it. 
+   Let's keep it minimal or hide it. Image didn't show footer either. 
+   Let's compact it. */
+.app-footer {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.7rem;
+  background: #f1f1f1;
 }
