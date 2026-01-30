@@ -23,9 +23,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ==== Sidebar Logic ====
   const sidebar = document.getElementById("app-sidebar");
+  const overlay = document.getElementById("sidebar-overlay");
   const toggleBtnDesktop = document.getElementById("toggle-sidebar-desktop");
   const toggleBtnMobile = document.getElementById("toggle-sidebar-mobile");
   const closeBtn = document.getElementById("close-sidebar");
+
+  function toggleSidebar(show) {
+    if (show) {
+      sidebar.classList.add("open");
+      if (overlay) overlay.classList.add("active");
+    } else {
+      sidebar.classList.remove("open");
+      if (overlay) overlay.classList.remove("active");
+    }
+  }
 
   if (toggleBtnDesktop) {
     toggleBtnDesktop.addEventListener("click", () => {
@@ -35,13 +46,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (toggleBtnMobile) {
     toggleBtnMobile.addEventListener("click", () => {
-      sidebar.classList.toggle("open");
+      const isOpen = sidebar.classList.contains("open");
+      toggleSidebar(!isOpen);
     });
   }
 
   if (closeBtn) {
     closeBtn.addEventListener("click", () => {
-      sidebar.classList.remove("open");
+      toggleSidebar(false);
+    });
+  }
+
+  if (overlay) {
+    overlay.addEventListener("click", () => {
+      toggleSidebar(false);
     });
   }
 });
@@ -1186,71 +1204,52 @@ function renderGantt(tasks) {
   }
 
   // Transform to Frappe Gantt format WITH dependencies
-  const ganttTasks = validTasks.map((task) => ({
-    id: String(task.id || task.UID),
-    name: task.name || task.Name,
-    start: (task.start || task.Start).split("T")[0],
-    end: (task.finish || task.Finish).split("T")[0],
-    progress: task.percentComplete || task.PercentComplete || 0,
-    dependencies: (task.predecessors || []).join(", "), // Frappe Gantt expects comma-separated IDs
-    custom_class: task.isSummary
-      ? "bar-summary"
-      : task.isMilestone
-        ? "bar-milestone"
-        : String(task.Critical) === "1" || task.Critical === true
-          ? "bar-critical"
-          : "bar-standard",
-  }));
+  // [FIX] Use global cache to bypass Frappe Gantt property filtering
+  window.ganttTaskCache = {};
+
+  const ganttTasks = validTasks.map((task) => {
+    // Calculate custom attributes
+    const durationText = formatDuration(task.duration || task.Duration);
+    const isCritical = String(task.Critical) === "1" || task.Critical === true;
+    const predecessorsList = (task.predecessors || []).join(", ");
+
+    // Store in proper Frappe format
+    const ganttTask = {
+      id: String(task.id || task.UID),
+      name: task.name || task.Name,
+      start: (task.start || task.Start).split("T")[0],
+      end: (task.finish || task.Finish).split("T")[0],
+      progress: task.percentComplete || task.PercentComplete || 0,
+      dependencies: predecessorsList, // Frappe Gantt expects comma-separated IDs
+      custom_class: task.isSummary
+        ? "bar-summary"
+        : task.isMilestone
+          ? isCritical
+            ? "bar-critical-milestone"
+            : "bar-milestone"
+          : isCritical
+            ? "bar-critical" // Apply critical class based on logic
+            : "bar-standard",
+    };
+
+    // Save extended data to cache
+    window.ganttTaskCache[ganttTask.id] = {
+      ...ganttTask,
+      _duration_text: durationText,
+      _is_critical: isCritical,
+      _predecessors_list: predecessorsList,
+    };
+
+    return ganttTask;
+  });
 
   try {
+    console.log("Renderizando Gantt con Popup Mejorado v2"); // Debug flag
     window.ganttInstance = new Gantt("#gantt-chart", ganttTasks, {
       view_mode: "Week",
       date_format: "YYYY-MM-DD",
       language: "es",
-      popup_trigger: "mouseover", // Hover trigger
-      custom_popup_html: function (task) {
-        // Calculate Theoretical Progress
-        const dateInput = document.getElementById("cutoff-date");
-        let theoretical = 0;
-        let diffText = "";
-
-        if (dateInput && dateInput.value) {
-          const cutoff = new Date(dateInput.value);
-          const start = new Date(task.start);
-          const end = new Date(task.end);
-
-          if (cutoff < start) {
-            theoretical = 0;
-          } else if (cutoff >= end) {
-            theoretical = 100;
-          } else {
-            const totalDuration = end - start;
-            const elapsed = cutoff - start;
-            if (totalDuration > 0) {
-              theoretical = Math.round((elapsed / totalDuration) * 100);
-            }
-          }
-
-          // Calculate Difference
-          const actual = parseFloat(task.progress);
-          const diff = actual - theoretical;
-          const diffColor = diff >= 0 ? "green" : "red";
-          diffText = `<p style="font-size: 0.8em; margin-top: 4px;">Dedv: <strong style="color: ${diffColor}">${diff > 0 ? "+" : ""}${diff}%</strong></p>`;
-        }
-
-        return `
-          <div class="gantt-popup">
-            <h4>${task.name}</h4>
-            <p>Inicio: ${formatDate(task.start)}</p>
-            <p>Fin: ${formatDate(task.end)}</p>
-            <div style="margin-top: 6px; border-top: 1px solid #eee; padding-top: 4px;">
-                <p>Real: <strong>${task.progress}%</strong></p>
-                <p>Teórico: <strong>${theoretical}%</strong></p>
-                ${diffText}
-            </div>
-          </div>
-        `;
-      },
+      popup_trigger: "mouseover", // We keep this as default, but we hide .popup-wrapper via CSS
     });
 
     // Initialize Cutoff Date Input
@@ -1280,13 +1279,17 @@ function renderGantt(tasks) {
       alignTaskLabels(); // Fix text alignment (Left)
       renderPreStartZone();
       scrollToStart(); // Scroll to project start
-      bindTooltipHover(); // Enable custom hover logic for popups
+      bindTooltipHover(); // MANUALLY BIND TOOLTIPS
 
       // fixMonthViewBarPositions must run AFTER any possible refresh from fixGanttDateRange
       // Use additional delay to ensure Frappe's render cycle completes
       setTimeout(() => {
         fixMonthViewBarPositions(); // Fix bar positions for Month view (30-day bug)
         fixBarLabels(); // Fix label classes for ALL views (unify styles)
+
+        // Ensure fixing dependency arrows and tooltips again just in case
+        fixDependencyArrows();
+        bindTooltipHover();
 
         // Reveal chart only after all corrections are applied
         requestAnimationFrame(() => {
@@ -1390,7 +1393,10 @@ function changePViewMode(mode) {
         fixMonthViewBarPositions(); // Fix bar positions for Month view (30-day bug)
         fixBarLabels(); // Fix label classes for ALL views
         fixDependencyArrows(); // Fix arrows after bar repositioning
-        bindTooltipHover(); // Re-bind popups after view mode change
+        fixMonthViewBarPositions(); // Fix bar positions for Month view (30-day bug)
+        fixBarLabels(); // Fix label classes for ALL views
+        fixDependencyArrows(); // Fix arrows after bar repositioning
+        bindTooltipHover(); // RE-BIND MANUALLY
       }, 150);
     }, 300);
 
@@ -1434,7 +1440,7 @@ function toggleGanttFullscreen() {
           fixDependencyArrows(); // Fix arrows after refresh
           renderPreStartZone();
           scrollToStart();
-          bindTooltipHover(); // Re-bind popups after fullscreen toggle
+          bindTooltipHover(); // RE-BIND MANUALLY
 
           requestAnimationFrame(() => {
             ganttContainer.style.opacity = 1;
@@ -1464,7 +1470,7 @@ function toggleGanttFullscreen() {
           fixDependencyArrows(); // Fix arrows after refresh
           renderPreStartZone();
           scrollToStart();
-          bindTooltipHover(); // Re-bind popups after fullscreen toggle
+          bindTooltipHover(); // RE-BIND MANUALLY
 
           requestAnimationFrame(() => {
             ganttContainer.style.opacity = 1;
@@ -1579,7 +1585,149 @@ function renderCutoffLine() {
   // Side padding is commonly applied to grid
   // But SVG 0,0 usually aligns with gantt_start in the grid area.
 
-  // Let's draw and see.
+  // ==== Custom Tooltip Logic (Bypassing Library) ====
+  // We manually attach hover events to the SVGs because the library ignores custom template
+  function bindTooltipHover() {
+    const bars = document.querySelectorAll(
+      "#gantt-chart .bar-wrapper, #gantt-chart .bar-group",
+    );
+
+    bars.forEach((bar) => {
+      // Clean previous listeners if any (simple approach: clone node or just add new ones)
+      // Adding duplicates usually fine if logic is idempotent, but better to be safe
+      // Since we re-render chart often, elements are normally new.
+
+      bar.addEventListener("mouseenter", (e) => {
+        const taskId = bar.getAttribute("data-id");
+        if (taskId) {
+          showCustomPopup(taskId, e);
+        }
+      });
+
+      bar.addEventListener("mouseleave", () => {
+        hideCustomPopup();
+      });
+
+      // Also track mouse move to follow cursor?
+      // Frappe gantt usually follows cursor.
+      bar.addEventListener("mousemove", (e) => {
+        updatePopupPosition(e);
+      });
+    });
+  }
+
+  let customPopupEl = null;
+
+  function showCustomPopup(taskId, event) {
+    // 1. Get Data
+    const task = window.ganttTaskCache[taskId];
+    if (!task) return;
+
+    // 2. Build HTML (Reusing the logic we wrote before)
+    const durationText = task._duration_text || "-";
+    const isCritical = task._is_critical || false;
+    const predecessorsList = task._predecessors_list || "";
+
+    // Theoretical Logic
+    const dateInput = document.getElementById("cutoff-date");
+    let theoretical = 0;
+    let diffText = "";
+    let theoreticalHtml = "";
+
+    if (dateInput && dateInput.value) {
+      const cutoff = new Date(dateInput.value);
+      const start = new Date(task.start);
+      const end = new Date(task.end);
+
+      if (cutoff < start) {
+        theoretical = 0;
+      } else if (cutoff >= end) {
+        theoretical = 100;
+      } else {
+        const totalDuration = end - start;
+        const elapsed = cutoff - start;
+        if (totalDuration > 0) {
+          theoretical = Math.round((elapsed / totalDuration) * 100);
+        }
+      }
+
+      // Calculate Difference
+      const actual = parseFloat(task.progress);
+      const diff = actual - theoretical;
+      const diffColor = diff >= 0 ? "green" : "red";
+      diffText = `<span>Desv: <strong style="color: ${diffColor}">${diff > 0 ? "+" : ""}${diff}%</strong></span>`;
+      if (theoretical > 0) {
+        theoreticalHtml = `<div class="popup-row theoretical"><small>Teórico: ${theoretical}%</small></div>`;
+      }
+    }
+
+    const html = `
+    <div class="popup-header">
+        <h4>${task.name}</h4>
+        ${isCritical ? '<span class="badge-critical">🔴 Crítica</span>' : ""}
+    </div>
+    <div class="popup-body">
+        <div class="popup-row">
+            <span>📅 ${formatDate(task.start)} - ${formatDate(task.end)}</span>
+            <span class="popup-duration">(${durationText})</span>
+        </div>
+        ${predecessorsList ? `<div class="popup-row dependencies">🔗 Pre: ${predecessorsList}</div>` : ""}
+        
+        <div class="popup-progress-section">
+            <div class="popup-row" style="justify-content: space-between; margin-bottom: 2px;">
+                <span>Progreso: <strong>${task.progress}%</strong></span>
+                ${diffText}
+            </div>
+            <div class="popup-progress-bar">
+                <div class="popup-progress-fill" style="width: ${task.progress}%"></div>
+            </div>
+            ${theoreticalHtml}
+        </div>
+    </div>
+  `;
+
+    // 3. Create or Update Element
+    if (!customPopupEl) {
+      customPopupEl = document.createElement("div");
+      customPopupEl.className = "gantt-popup";
+      document.body.appendChild(customPopupEl);
+    }
+
+    customPopupEl.innerHTML = html;
+    customPopupEl.style.display = "block";
+
+    // 4. Position
+    updatePopupPosition(event);
+  }
+
+  function hideCustomPopup() {
+    if (customPopupEl) {
+      customPopupEl.style.display = "none";
+    }
+  }
+
+  function updatePopupPosition(e) {
+    if (!customPopupEl) return;
+
+    const width = 260; // From CSS
+    const offset = 15;
+
+    let left = e.pageX + offset;
+    let top = e.pageY + offset;
+
+    // Boundary check
+    if (left + width > window.innerWidth) {
+      left = e.pageX - width - offset;
+    }
+
+    // Bottom check (simple)
+    if (top + 150 > window.innerHeight + window.scrollY) {
+      top = e.pageY - 150;
+    }
+
+    customPopupEl.style.left = `${left}px`;
+    customPopupEl.style.top = `${top}px`;
+  }
   const height = svg.getAttribute("height");
 
   const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -1601,20 +1749,20 @@ function renderCutoffLine() {
 // We must force milestones to be perfect squares and re-center them.
 function fixMilestoneShapes() {
   // 1. Find all milestone bars
-  const milestones = document.querySelectorAll(".bar-milestone .bar");
+  const milestones = document.querySelectorAll(
+    ".bar-milestone .bar, .bar-critical-milestone .bar",
+  );
 
   milestones.forEach((rect) => {
-    // Check if already fixed to avoid double processing (optional)
-    if (rect.getAttribute("data-diamond-fixed")) return;
-
     // 2. Get current geometry
     const x = parseFloat(rect.getAttribute("x"));
     const y = parseFloat(rect.getAttribute("y"));
     const width = parseFloat(rect.getAttribute("width"));
     const height = parseFloat(rect.getAttribute("height"));
 
-    // 3. Define diamond size (e.g., 20px)
-    const size = 18;
+    // 3. Define diamond size (e.g., 16px)
+    // Reduced from 18 to 16 to ensure rotation fits comfortably in 38px row
+    const size = 16;
 
     // 4. Calculate center of original bar
     const cx = x + width / 2;
@@ -1631,6 +1779,9 @@ function fixMilestoneShapes() {
     rect.setAttribute("y", newY);
     rect.setAttribute("rx", "0");
     rect.setAttribute("ry", "0");
+    rect.style.transformBox = "fill-box";
+    rect.style.transformOrigin = "center";
+    rect.style.transform = "rotate(45deg)";
 
     // Mark as fixed
     rect.setAttribute("data-diamond-fixed", "true");
@@ -2432,4 +2583,152 @@ function renderPreStartZone() {
   try {
     console.log(`Pre-Start Zone Rendered: X=${x}px from Diff=${diffHours}h`);
   } catch (e) {}
+}
+
+// ==== Custom Tooltip Logic (Bypassing Library) ====
+// We manually attach hover events to the SVGs because the library ignores custom template
+function bindTooltipHover() {
+  const bars = document.querySelectorAll(
+    "#gantt-chart .bar-wrapper, #gantt-chart .bar-group",
+  );
+
+  bars.forEach((bar) => {
+    // Clean previous listeners if any
+    bar.onmouseenter = (e) => {
+      const taskId = bar.getAttribute("data-id");
+      if (taskId) showCustomPopup(taskId, e);
+    };
+
+    bar.onmouseleave = () => {
+      hideCustomPopup();
+    };
+
+    bar.onmousemove = (e) => {
+      updatePopupPosition(e);
+    };
+  });
+}
+
+let customPopupEl = null;
+
+function showCustomPopup(taskId, event) {
+  // 1. Get Data
+  const task = window.ganttTaskCache[taskId];
+  if (!task) return;
+
+  // 2. Build HTML (Reusing the logic we wrote before)
+  const durationText = task._duration_text || "-";
+  const isCritical = task._is_critical || false;
+  const predecessorsList = task._predecessors_list || "";
+
+  // Theoretical Logic
+  const dateInput = document.getElementById("cutoff-date");
+  let theoretical = 0;
+  let diffText = "";
+  let theoreticalHtml = "";
+
+  if (dateInput && dateInput.value) {
+    const cutoff = new Date(dateInput.value);
+    const start = new Date(task.start);
+    const end = new Date(task.end);
+
+    if (cutoff < start) {
+      theoretical = 0;
+    } else if (cutoff >= end) {
+      theoretical = 100;
+    } else {
+      const totalDuration = end - start;
+      const elapsed = cutoff - start;
+      if (totalDuration > 0) {
+        theoretical = Math.round((elapsed / totalDuration) * 100);
+      }
+    }
+
+    // Calculate Difference
+    const actual = parseFloat(task.progress);
+    const diff = actual - theoretical;
+    const diffColor =
+      diff >= 0 ? "var(--aia-corp-main)" : "var(--aia-alert-main)";
+    diffText =
+      '<span>Dedv: <strong style="color: ' +
+      diffColor +
+      '">' +
+      (diff > 0 ? "+" : "") +
+      diff +
+      "%</strong></span>";
+
+    if (theoretical > 0) {
+      theoreticalHtml =
+        '<div class="popup-row theoretical"><small>Teórico: ' +
+        theoretical +
+        "%</small></div>";
+    }
+  }
+
+  const html = `
+    <div class="popup-header">
+        <h4>${task.name}</h4>
+        ${isCritical ? '<span class="badge-critical">🔴 Crítica</span>' : ""}
+    </div>
+    <div class="popup-body">
+        <div class="popup-row">
+            <span>📅 ${formatDate(task.start)} - ${formatDate(task.end)}</span>
+            <span class="popup-duration">(${durationText})</span>
+        </div>
+        ${predecessorsList ? `<div class="popup-row dependencies">🔗 Pre: ${predecessorsList}</div>` : ""}
+        
+        <div class="popup-progress-section">
+            <div class="popup-row" style="justify-content: space-between; margin-bottom: 2px;">
+                <span>Progreso: <strong>${task.progress}%</strong></span>
+                ${diffText}
+            </div>
+            <div class="popup-progress-bar">
+                <div class="popup-progress-fill" style="width: ${task.progress}%"></div>
+            </div>
+            ${theoreticalHtml}
+        </div>
+    </div>
+  `;
+
+  // 3. Create or Update Element
+  if (!customPopupEl) {
+    customPopupEl = document.createElement("div");
+    customPopupEl.className = "gantt-popup";
+    document.body.appendChild(customPopupEl);
+  }
+
+  customPopupEl.innerHTML = html;
+  customPopupEl.style.display = "block";
+
+  // 4. Position
+  updatePopupPosition(event);
+}
+
+function hideCustomPopup() {
+  if (customPopupEl) {
+    customPopupEl.style.display = "none";
+  }
+}
+
+function updatePopupPosition(e) {
+  if (!customPopupEl) return;
+
+  const width = 260; // From CSS
+  const offset = 15;
+
+  let left = e.pageX + offset;
+  let top = e.pageY + offset;
+
+  // Boundary check
+  if (left + width > window.innerWidth) {
+    left = e.pageX - width - offset;
+  }
+
+  // Bottom check (simple)
+  if (top + 150 > window.innerHeight + window.scrollY) {
+    top = e.pageY - 150;
+  }
+
+  customPopupEl.style.left = left + "px";
+  customPopupEl.style.top = top + "px";
 }

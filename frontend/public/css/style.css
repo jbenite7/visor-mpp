@@ -1,1428 +1,961 @@
-:root {
-  /* =========================================
-     AIA Brand Identity - Total Adoption v1.0
-     Source: manual-de-marca-aia.json
-     ========================================= */
+@layer reset, theme, base, layout, components, utilities;
 
-  /* --- CORPORATE (Verde AIA) --- */
-  --aia-corp-dark: #1a3c2a;
-  --aia-corp-main: #1a5633;
-  --aia-corp-mid: #4a7c64;
-  --aia-corp-light: #8cb4a1;
-  --aia-corp-xlight: #d5e5db;
+@layer theme {
+  :root {
+    /* =========================================
+       AIA Brand Identity - OKLCH Palette
+       Source: manual-de-marca-aia.json
+       ========================================= */
 
-  /* --- CONSTRUCTION (Naranja) --- */
-  --aia-const-dark: #8b4011;
-  --aia-const-main: #e87722;
-  --aia-const-mid: #f0a05e;
-  --aia-const-light: #f6c79b;
-  --aia-const-xlight: #fbead9;
+    /* --- CORPORATE (Verde AIA) --- */
+    --aia-corp-dark: oklch(35% 0.09 145); /* #1a3c2a approx */
+    --aia-corp-main: oklch(42% 0.12 145); /* #1a5633 approx - Primary Green */
+    --aia-corp-mid: oklch(55% 0.1 145); /* #4a7c64 approx */
+    --aia-corp-light: oklch(75% 0.08 145); /* #8cb4a1 approx */
+    --aia-corp-xlight: oklch(92% 0.04 145); /* #d5e5db approx */
 
-  /* --- ARCHITECTURE (Azul) --- */
-  --aia-arch-dark: #2a5a8f;
-  --aia-arch-main: #4a81bd;
-  --aia-arch-mid: #7da5d3;
-  --aia-arch-light: #b1cae6;
-  --aia-arch-xlight: #e6f0fa;
+    /* --- CONSTRUCTION (Naranja) --- */
+    --aia-const-dark: oklch(45% 0.15 45); /* #8b4011 approx */
+    --aia-const-main: oklch(
+      65% 0.2 50
+    ); /* #e87722 approx - Construction Orange */
+    --aia-const-mid: oklch(75% 0.15 55); /* #f0a05e approx */
+    --aia-const-light: oklch(85% 0.1 60); /* #f6c79b approx */
+    --aia-const-xlight: oklch(95% 0.05 65); /* #fbead9 approx */
 
-  /* --- PROJECTS (Verde Agua) --- */
-  --aia-proj-dark: #007a71;
-  --aia-proj-main: #00a499;
-  --aia-proj-mid: #5ec9bd;
-  --aia-proj-light: #ace5e0;
-  --aia-proj-xlight: #e3f9f7;
+    /* --- ARCHITECTURE (Azul) --- */
+    --aia-arch-dark: oklch(45% 0.1 250); /* #2a5a8f approx */
+    --aia-arch-main: oklch(
+      60% 0.15 250
+    ); /* #4a81bd approx - Architecture Blue */
+    --aia-arch-mid: oklch(70% 0.12 250); /* #7da5d3 approx */
+    --aia-arch-light: oklch(85% 0.08 250); /* #b1cae6 approx */
+    --aia-arch-xlight: oklch(96% 0.03 250); /* #e6f0fa approx */
 
-  /* --- ALERTS (Rojo) --- */
-  --aia-alert-dark: #9a1f1f;
-  --aia-alert-main: #e53935;
-  --aia-alert-mid: #ed7472;
-  --aia-alert-light: #f5b1b0;
-  --aia-alert-xlight: #fdecec;
+    /* --- PROJECTS (Verde Agua) --- */
+    --aia-proj-dark: oklch(45% 0.1 180); /* #007a71 approx */
+    --aia-proj-main: oklch(60% 0.15 180); /* #00a499 approx - Projects Teal */
+    --aia-proj-mid: oklch(75% 0.12 180); /* #5ec9bd approx */
+    --aia-proj-light: oklch(88% 0.08 180); /* #ace5e0 approx */
+    --aia-proj-xlight: oklch(97% 0.03 180); /* #e3f9f7 approx */
 
-  /* --- WARNINGS (Amarillo/Ambar) --- */
-  --aia-warn-dark: #a0731a;
-  --aia-warn-main: #ffca28;
-  --aia-warn-mid: #ffd966;
-  --aia-warn-light: #ffecb3;
-  --aia-warn-xlight: #fff8e1;
+    /* --- ALERTS (Rojo) --- */
+    --aia-alert-dark: oklch(35% 0.15 25); /* #9a1f1f approx */
+    --aia-alert-main: oklch(60% 0.22 25); /* #e53935 approx - Alert Red */
+    --aia-alert-mid: oklch(70% 0.18 25); /* #ed7472 approx */
+    --aia-alert-light: oklch(85% 0.1 25); /* #f5b1b0 approx */
+    --aia-alert-xlight: oklch(96% 0.04 25); /* #fdecec approx */
 
-  /* --- TYPOGRAPHY & GRAYS --- */
-  --text-main: #1c1c1e; /* Principal */
-  --text-secondary: #4a4a4d; /* Secundario */
-  --text-muted: #a9a9a9; /* Terciario/Bordes */
-  --border-color: #d1d1d1; /* Separadores */
-  --bg-secondary: #eaeaea; /* Fondo Secundario */
+    /* --- WARNINGS (Amarillo/Ambar) --- */
+    --aia-warn-dark: oklch(55% 0.15 85); /* #a0731a approx */
+    --aia-warn-main: oklch(85% 0.18 85); /* #ffca28 approx - Warning Amber */
+    --aia-warn-mid: oklch(90% 0.15 85); /* #ffd966 approx */
+    --aia-warn-light: oklch(95% 0.1 85); /* #ffecb3 approx */
+    --aia-warn-xlight: oklch(98% 0.05 85); /* #fff8e1 approx */
 
-  /* --- BACKGROUNDS & NEUTRALS --- */
-  --aia-linen: #f4f1ea; /* Base Principal */
-  --aia-alabaster: #fafafa; /* Superficies */
-  --aia-beige: #f5f5dc; /* Destacados */
+    /* --- NEUTRALS & BACKGROUNDS --- */
+    --aia-linen: oklch(96% 0.01 90); /* #f4f1ea approx - Main Warm Neutral */
+    --aia-alabaster: oklch(98% 0.005 90); /* #fafafa approx - Surface White */
+    --aia-beige: oklch(97% 0.02 95); /* #f5f5dc approx */
+    --gray-50: oklch(99% 0 0);
+    --gray-100: oklch(96% 0.002 280); /* #f1f5f9 */
+    --gray-200: oklch(92% 0.005 280); /* #e2e8f0 */
+    --gray-300: oklch(87% 0.01 280); /* #cbd5e1 */
+    --gray-400: oklch(70% 0.02 280); /* #94a3b8 */
+    --gray-500: oklch(55% 0.03 280); /* #64748b */
+    --gray-600: oklch(45% 0.04 280); /* #475569 */
+    --gray-700: oklch(35% 0.04 280); /* #334155 */
+    --gray-800: oklch(25% 0.04 280); /* #1e293b */
+    --gray-900: oklch(15% 0.04 280); /* #0f172a */
 
-  /* --- FUNCTIONAL MAPPING --- */
-  --primary-color: var(--aia-corp-main); /* Default to Corporate Green */
-  --primary-dark: var(--aia-corp-dark);
-  --primary-light: var(--aia-corp-light);
+    /* --- FUNCTIONAL MAPPING --- */
+    --color-primary: var(--aia-corp-main);
+    --color-primary-hover: var(--aia-corp-dark);
+    --color-secondary: var(--aia-proj-main);
+    --color-bg-body: var(--aia-linen);
+    --color-bg-surface: #ffffff;
+    --color-bg-surface-secondary: var(--aia-alabaster);
+    --color-text-main: var(--gray-900);
+    --color-text-secondary: var(--gray-600);
+    --color-text-muted: var(--gray-400);
+    --color-border: var(--gray-200);
 
-  --secondary-color: var(--aia-proj-main); /* Projects Teal */
+    --font-heading: "Montserrat", sans-serif;
+    --font-body: "Inter", sans-serif;
 
-  --bg-color: var(--aia-linen);
-  --card-bg: #ffffff;
-  --app-header-bg: var(--aia-corp-dark);
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 12px;
 
-  --radius: 12px;
-  --shadow: 0 4px 12px -2px rgba(26, 60, 42, 0.15);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md:
+      0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg:
+      0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+    /* Gantt metrics for alignment */
+    --gantt-row-height: 38px;
+    --gantt-header-height: 85px;
+  }
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
-body {
-  font-family: "Inter", sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  line-height: 1.5;
-  /* Eliminamos el gradiente azul anterior por el fondo Linen solido */
-  background: var(--bg-color);
-  min-height: 100vh;
+@layer base {
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-bg-body);
+    color: var(--color-text-main);
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow: hidden; /* App-like structure */
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--color-text-main);
+  }
+
+  button {
+    font-family: inherit;
+  }
 }
 
-.container {
-  max-width: 95%;
-  margin: 0 auto;
-  padding: 1rem;
-  width: 100%;
+@layer layout {
+  .app-layout {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    background-color: var(--color-bg-body);
+  }
+
+  .container-fluid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+    padding: 0;
+  }
+
+  .results-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+  }
+
+  .view-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Split View Layout */
+  .split-view {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg-surface);
+    overflow: hidden;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  }
+
+  .split-pane {
+    overflow: auto;
+    position: relative;
+  }
+
+  .table-pane {
+    width: 40%;
+    min-width: 300px;
+    border-right: 1px solid var(--color-border);
+    background: var(--color-bg-surface);
+    z-index: 2;
+  }
+
+  .gantt-pane {
+    flex: 1;
+    min-width: 0;
+    background: var(--color-bg-surface);
+  }
+
+  /* Fullscreen overrides */
+  .fullscreen-mode {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background: var(--color-bg-surface);
+    padding: 1rem;
+    display: flex !important;
+    flex-direction: column;
+
+    & #gantt-chart .gantt-container {
+      height: calc(100vh - 80px) !important;
+      max-height: none !important;
+    }
+  }
 }
 
-/* Layout Structure */
-body {
-  overflow: hidden; /* Prevent body scroll, handle in main-content */
-}
+@layer components {
+  /* --- Sidebar --- */
+  .sidebar {
+    width: 300px;
+    background-color: var(--aia-linen);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex-shrink: 0;
+    z-index: 100;
+    /* transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); */
+    transition:
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-.app-layout {
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-}
+    @media (max-width: 768px) {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      transform: translateX(-100%);
+      width: 85%; /* Mobile width */
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+    }
 
-/* Sidebar Styles */
-.sidebar {
-  width: 320px;
-  background-color: var(--aia-linen);
-  border-right: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  flex-shrink: 0;
-  z-index: 100;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+    &.open {
+      transform: translateX(0);
+    }
 
-.sidebar-header {
-  padding: 1.5rem;
-  background: var(--aia-corp-dark);
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    /* Desktop Collapsed State (Mini Sidebar) */
+    &.collapsed {
+      @media (min-width: 769px) {
+        width: 60px;
 
-.sidebar-header h2 {
-  font-family: "Montserrat", sans-serif;
-  font-size: 1.2rem;
-  margin: 0;
-}
+        & .sidebar-header {
+          padding: 0;
+          justify-content: center;
 
-/* Main Top Bar (Logo Container) */
-.main-top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 1.5rem;
-  background-color: var(--aia-linen);
-  border-bottom: 1px solid var(--border-color);
-  flex-shrink: 0;
-  height: 64px;
-  gap: 1rem;
-}
+          & h2 {
+            display: none;
+          }
+        }
 
-.top-bar-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-}
+        & .saved-projects-list {
+          display: none;
+        }
+      }
+    }
+  }
 
-.top-bar-actions .btn-back {
-  margin-bottom: 0;
-  display: flex;
-  align-items: center;
-  height: 36px;
-}
+  /* Overlay for mobile sidebar */
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 90;
+    display: none;
 
-.top-bar-actions .view-toggle {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
+    &.active {
+      display: block;
+      @media (min-width: 769px) {
+        display: none;
+      }
+    }
+  }
 
-.top-bar-actions .toggle-btn {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 36px;
-  white-space: nowrap;
-}
+  .sidebar-header {
+    height: 64px;
+    min-height: 64px;
+    padding: 0 1.5rem;
+    background: var(--aia-corp-dark);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-.toolbar-group {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
+    & h2 {
+      font-size: 1.2rem;
+      color: white;
+      margin: 0;
+    }
+  }
 
-.toolbar-divider {
-  width: 1px;
-  height: 24px;
-  background-color: var(--border-color);
-  margin: 0 0.5rem;
-}
+  .saved-projects-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
 
-.brand-logo {
-  display: flex;
-  align-items: center;
-  transition: opacity 0.2s;
-}
-
-.brand-logo:hover {
-  opacity: 0.8;
-}
-
-.brand-logo img {
-  height: 48px; /* Slightly larger as it has more space now */
-  width: auto;
-  object-fit: contain;
-}
-
-/* Mobile Adjustments for Top Bar */
-@media (max-width: 768px) {
+  /* --- Top Bar --- */
   .main-top-bar {
-    padding: 0.5rem 1rem;
-    background-color: white; /* Ensure visibility on mobile if needed */
-    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+    background-color: var(--aia-linen);
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+    height: 64px;
+    gap: 1rem;
+    overflow-x: auto; /* Allow scroll on very narrow screens */
+
+    @media (max-width: 768px) {
+      padding: 0 1rem;
+      background-color: white;
+    }
   }
 
   .brand-logo img {
-    height: 32px;
-  }
-}
+    height: 48px;
+    width: auto;
+    object-fit: contain;
 
-.saved-projects-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-}
-
-/* Main Content Styles */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
-  position: relative;
-  background-color: var(--bg-color);
-}
-
-.container-fluid {
-  max-width: 100%;
-  padding: 1.5rem;
-  flex: 1;
-  width: 100%;
-}
-
-/* Header Adjustments */
-.app-header {
-  background: var(--aia-corp-main); /* Restore AIA Green background */
-  margin-bottom: 0;
-  padding: 1rem;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-  justify-content: center;
-  position: relative;
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  color: white; /* Visible relative to AIA Green */
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-}
-
-.icon-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Mobile Sidebar (Default Hidden/Slide) */
-@media (min-width: 1025px) {
-  /* Desktop styles */
-  .hamburger-btn {
-    display: none; /* Hide top-bar hamburger on desktop */
+    @media (max-width: 768px) {
+      height: 32px;
+    }
   }
 
-  .sidebar-toggle-btn {
-    display: flex; /* Show sidebar-internal toggle */
-    color: white;
-    font-size: 1.2rem;
-  }
-
-  .closed-sidebar-btn,
-  .mobile-hamburger-btn {
-    display: none;
-  }
-
-  .sidebar {
-    position: relative;
-    transform: none;
-    width: 300px; /* Default expanded width */
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: visible; /* Allow dropdowns if needed, but usually hidden */
-  }
-
-  /* Rail (Collapsed) State */
-  .sidebar.collapsed {
-    width: 60px;
-  }
-
-  .sidebar.collapsed .sidebar-header h2,
-  .sidebar.collapsed .saved-projects-list,
-  .sidebar.collapsed .project-info,
-  .sidebar.collapsed .project-actions,
-  .sidebar.collapsed .group-toggle {
-    opacity: 0;
-    visibility: hidden;
-    position: absolute; /* Take out of flow to prevent layout breaks */
-    pointer-events: none;
-  }
-
-  .sidebar.collapsed .sidebar-header {
-    justify-content: center;
-    padding: 1rem 0;
-  }
-
-  /* Centered toggle in rail */
-  .sidebar.collapsed .sidebar-toggle-btn {
-    margin: 0;
-  }
-}
-
-/* Base Sidebar Styles (Mobile & Desktop) */
-.sidebar-header {
-  height: 64px;
-  min-height: 64px;
-  background: var(--aia-corp-dark);
-}
-
-/* Ensure versions are visible */
-.group-items {
-  display: flex !important; /* Force flex */
-  flex-direction: column;
-  background: white;
-  width: 100%;
-}
-
-.group-items.hidden {
-  display: none !important;
-}
-
-.sub-card {
-  display: flex;
-  flex-direction: column; /* Ensure content stacks */
-  min-height: 50px; /* Prevent zero-height collapse */
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-/* Remove old container/drop-zone styles conflicts if any */
-.container {
-  max-width: 100%;
-  padding: 0;
-}
-
-.drop-zone {
-  margin: 2rem auto;
-}
-
-.drop-zone:hover,
-.drop-zone.dragover {
-  background-color: var(--aia-corp-xlight);
-  transform: scale(1.02);
-}
-
-.icon-container svg {
-  width: 48px;
-  height: 48px;
-  color: var(--primary-color);
-  margin-bottom: 1rem;
-}
-
-.hidden {
-  display: none !important;
-}
-
-.status-indicator {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  margin-top: 1rem;
-}
-
-/* Mobile First Adjustments */
-/* Mobile First Adjustments */
-@media (min-width: 768px) {
-  .app-header h1 {
-    font-size: 2rem;
-  }
-}
-
-/* Helpers */
-.text-xs {
-  font-size: 0.75rem;
-}
-.text-muted {
-  color: var(--text-muted);
-}
-
-/* Loader */
-.loader {
-  border: 4px solid var(--aia-linen);
-  border-top: 4px solid var(--primary-color);
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Project View */
-.btn-back {
-  background: white;
-  border: 1px solid var(--border-color);
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius);
-  margin-bottom: 1rem;
-  cursor: pointer;
-}
-
-.project-header {
-  background: white;
-  padding: 1.5rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  margin-bottom: 1.5rem;
-}
-
-.project-meta {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
-
-/* Data Table */
-.table-responsive {
-  overflow-x: auto;
-  background: white;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 600px; /* Ensure it scrolls on very small screens */
-}
-
-.data-table th,
-.data-table td {
-  padding: 0.75rem 1rem;
-  text-align: left;
-  vertical-align: top; /* Alinear contenido arriba cuando hay múltiples líneas */
-  border-bottom: 1px solid var(--border-color);
-}
-
-.data-table td {
-  word-wrap: break-word;
-  word-break: normal;
-  white-space: normal; /* Permitir wrap de texto largo */
-}
-
-.data-table th {
-  background: var(--aia-alabaster);
-  font-weight: 600;
-  vertical-align: middle; /* Headers centrados verticalmente */
-}
-
-.summary-row {
-  font-weight: 600;
-  background-color: var(--aia-beige);
-}
-
-.milestone-row {
-  color: var(--primary-color);
-}
-
-/* View Toggle */
-.results-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.view-toggle {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.toggle-btn {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--border-color);
-  background: white;
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.toggle-btn:hover {
-  background: var(--aia-alabaster);
-}
-
-.toggle-btn.active {
-  background: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
-}
-
-/* Gantt Container - Fixed nested scroll issue */
-#gantt-view {
-  background: white;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 1rem;
-}
-
-/* ==== Split View (Tabla + Gantt) ==== */
-/* Unified Dimensions for synchronization */
-:root {
-  --row-height: 38px; /* Reverted to match calculated Gantt stride (24 + 14) */
-  --header-height: 85px; /* Matches actual measured Gantt SVG header height */
-}
-
-.data-table tr {
-  height: var(--row-height);
-  line-height: normal;
-}
-
-.data-table td {
-  padding-top: 0;
-  padding-bottom: 0;
-  vertical-align: middle;
-  height: var(--row-height);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  box-sizing: border-box;
-  font-size: 0.85rem;
-}
-
-/* Header Alignment */
-.data-table thead th {
-  height: var(--header-height);
-  line-height: normal;
-  vertical-align: middle;
-  padding-top: 0;
-  padding-bottom: 0;
-  box-sizing: border-box;
-
-  /* Sticky styling */
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--aia-alabaster);
-  box-shadow: 0 1px 0 var(--border-color);
-
-  /* Force explicit height to match SVG Header */
-  max-height: var(--header-height);
-  min-height: var(--header-height);
-}
-
-/* The Container */
-.split-view {
-  display: flex;
-  flex-direction: row;
-  height: calc(100vh - 200px);
-  width: 100%;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  background: white;
-  overflow: hidden;
-}
-
-.split-pane {
-  overflow-y: auto;
-  overflow-x: auto;
-  position: relative;
-}
-
-.table-pane {
-  width: 40%;
-  min-width: 300px;
-  border-right: 1px solid var(--border-color);
-  background: white;
-  z-index: 2;
-  padding-top: 0;
-}
-
-.gantt-pane {
-  flex: 1;
-  min-width: 0;
-  background: white;
-}
-
-/* Active Split View Button */
-.toggle-btn.active-split {
-  background: var(--aia-corp-main);
-  color: white;
-}
-
-/* Override Gantt container style in split view */
-#split-view .gantt-container {
-  height: auto !important;
-  max-height: none !important;
-  overflow: visible !important;
-}
-
-/* Frappe Gantt Customization */
-.bar-summary .bar {
-  fill: var(--text-secondary) !important;
-}
-
-.bar-milestone .bar {
-  fill: var(--primary-color) !important;
-}
-
-.gantt-popup {
-  padding: 0.5rem;
-}
-
-.gantt-popup h4 {
-  margin: 0 0 0.5rem;
-  font-size: 0.9rem;
-}
-
-.gantt-popup p {
-  margin: 0.25rem 0;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.no-data,
-.error {
-  text-align: center;
-  padding: 2rem;
-  color: var(--text-muted);
-}
-
-/* Mobile Adjustments */
-@media (max-width: 640px) {
-  .results-header {
-    flex-direction: column;
-    align-items: stretch;
+  .top-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
   }
 
   .view-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* --- Toolbars & Controls --- */
+  .toolbar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1.5rem;
+    background-color: var(--aia-const-mid); /* keeping legacy/requested bg */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    gap: 1rem;
+
+    /* Enhance with glassmorphism if modern */
+    background: oklch(from var(--aia-const-xlight) l c h / 0.5);
+    backdrop-filter: blur(8px);
+  }
+
+  .gantt-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1.5rem;
+    background: var(--color-bg-surface);
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+  }
+
+  /* --- Utilities & Icons --- */
+  .icon-container svg {
+    width: 64px;
+    height: 64px;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+  }
+
+  .size-6 {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* --- Buttons --- */
+  .btn,
+  button {
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+
+  .icon-btn {
+    background: none;
+    color: white;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
     justify-content: center;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  /* Sidebar toggle internal */
+  .sidebar-toggle-btn {
+    display: flex;
+    color: white;
+    font-size: 1.2rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+
+    @media (max-width: 768px) {
+      display: none; /* Hide desktop toggle on mobile inside sidebar if desired, or keep it as close? */
+      /* Actually desktop toggle is inside sidebar, we might want to hide it or keep it as close button alternative */
+    }
+  }
+
+  .mobile-hamburger-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+
+    @media (max-width: 768px) {
+      display: flex;
+    }
+  }
+
+  .closed-sidebar-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: white; /* Ensure contrast on dark sidebar header */
+
+    @media (max-width: 768px) {
+      display: flex;
+    }
+  }
+
+  .toggle-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-border);
+    background: white;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+
+    &:hover {
+      background: var(--aia-alabaster);
+    }
+
+    &.active {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+
+    &.active-split {
+      background: var(--aia-corp-main);
+      color: white;
+    }
+  }
+
+  .zoom-btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    border: 1px solid var(--color-border);
+    background: white;
+
+    &:hover {
+      background: var(--color-bg-surface-secondary);
+    }
+
+    &.active {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+  }
+
+  .btn-back {
+    background: white;
+    border: 1px solid var(--color-border);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    color: var(--color-text-main);
+
+    &:hover {
+      background: var(--aia-alabaster);
+    }
+  }
+
+  /* --- Data Table --- */
+  .data-table {
+    width: 100%;
+    border-collapse: separate; /* Required for sticky headers */
+    border-spacing: 0;
+    min-width: 100%; /* Take full width of scroll container */
+
+    & th,
+    & td {
+      padding: 0 1rem;
+      text-align: left;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--color-border);
+      height: var(--gantt-row-height);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.85rem;
+    }
+
+    & thead th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--aia-alabaster);
+      box-shadow: 0 1px 0 var(--color-border);
+      height: var(--gantt-header-height);
+      max-height: var(--gantt-header-height);
+      font-weight: 600;
+      color: var(--color-text-main);
+    }
+  }
+
+  /* Force scroll on table view container */
+  #table-view {
+    overflow: auto;
+    display: block; /* Override default flex to allow scroll block */
+  }
+
+  .summary-row {
+    background-color: var(--aia-beige);
+    font-weight: 600;
+  }
+
+  /* --- Project Cards --- */
+  .project-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-sm);
+    }
+  }
+
+  .project-group {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: white;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+
+    & .group-header {
+      background: #f1f5f9;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid transparent;
+    }
+
+    &:has(.group-items:not(.hidden)) .group-header {
+      border-bottom-color: var(--color-border);
+    }
+  }
+
+  .sub-card {
+    border-top: 1px solid var(--color-border);
+    padding: 0.5rem 1rem 0.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+
+    &:hover {
+      background: var(--aia-alabaster);
+      border-left: 3px solid var(--aia-proj-main);
+    }
+  }
+
+  /* --- Modals --- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: oklch(from var(--aia-corp-dark) l c h / 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 90%;
+    max-width: 450px;
+    animation: modalSlideUp 0.3s ease-out;
+  }
+
+  @keyframes modalSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* --- Gantt Customization --- */
+  #gantt-chart {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    padding: 0 1.5rem;
+
+    & .gantt-container {
+      height: 100% !important;
+      min-height: 500px; /* Ensure minimum height */
+      max-height: none !important;
+      overflow: auto;
+      flex: 1;
+
+      & svg {
+        overflow: visible !important;
+      }
+    }
+  }
+
+  /* Bars */
+  .bar-standard .bar {
+    fill: var(--aia-corp-xlight) !important;
+    stroke: var(--aia-corp-main) !important;
+    stroke-width: 1px;
+  }
+
+  .bar-summary .bar {
+    fill: var(--color-text-secondary) !important;
+  }
+
+  .bar-milestone,
+  .bar-critical-milestone {
+    overflow: visible !important; /* Prevent diamond peaks from being cut */
+  }
+
+  .bar-milestone .bar,
+  .bar-critical-milestone .bar {
+    fill: var(--aia-warn-main) !important;
+    stroke: var(--aia-warn-dark) !important;
+    transform: rotate(45deg) !important;
+    transform-box: fill-box !important;
+    transform-origin: center !important;
+    rx: 0 !important; /* Sharp corners for diamond */
+  }
+
+  .bar-critical .bar {
+    fill: var(--aia-alert-main) !important;
+  }
+
+  /* Specific override for critical milestone COLOR */
+  .bar-critical-milestone .bar {
+    fill: var(--aia-alert-main) !important;
+    stroke: var(--aia-alert-dark) !important;
+  }
+
+  .bar-progress {
+    fill: var(--color-text-main) !important;
+    fill-opacity: 0.6 !important;
+  }
+
+  /* Labels */
+  .bar-label {
+    font-weight: 500;
+
+    /* Inside (big) */
+    &.big {
+      fill: var(--aia-corp-dark) !important;
+      stroke: none;
+    }
+
+    /* Outside (small) */
+    &:not(.big),
+    &.small {
+      fill: var(--color-text-main) !important;
+      font-weight: 600;
+      paint-order: stroke fill;
+      stroke: white;
+      stroke-width: 3px;
+      stroke-linejoin: round;
+    }
+  }
+
+  /* Specific label overrides per type when 'big' (inside) */
+  .bar-summary .bar-label.big,
+  .bar-critical .bar-label.big {
+    fill: white !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+
+  .bar-milestone .bar-label,
+  .bar-critical-milestone .bar-label {
+    fill: var(--aia-warn-dark) !important;
+    font-weight: 700;
+    transform: translateX(10px);
+  }
+
+  .bar-critical-milestone .bar-label {
+    fill: var(--aia-alert-dark) !important;
+  }
+
+  /* Cutoff Line */
+  .cutoff-line {
+    stroke: var(--aia-alert-main);
+    stroke-width: 2;
+    stroke-dasharray: 5, 5;
+  }
+
+  .cutoff-label {
+    fill: var(--aia-alert-main);
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  /* Column Selector */
+  .column-selector {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .column-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .column-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    background: white;
+    border: 1px solid transparent;
+
+    &:hover {
+      background: var(--gray-100);
+      border-color: var(--color-border);
+    }
+
+    & input {
+      accent-color: var(--color-primary);
+    }
   }
 }
 
-/* Column Selector */
-.column-selector {
-  background: white;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
-
-.column-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 0.5rem;
-  max-height: 300px;
-  overflow-y: auto;
-  margin-bottom: 1rem;
-}
-
-.column-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: background 0.2s;
-  background: white;
-  border: 1px solid transparent;
-}
-
-.column-checkbox:hover {
-  background: #f1f5f9;
-  border-color: var(--border-color);
-}
-
-.column-checkbox.sortable-ghost {
-  opacity: 0.5;
-  background: var(--bg-secondary);
-  border: 1px dashed var(--primary-color);
-}
-
-.drag-handle {
-  color: var(--text-muted);
-  cursor: grab;
-  padding: 0 4px;
-  font-size: 1.2rem;
-  line-height: 1;
-}
-
-.drag-handle:active {
-  cursor: grabbing;
-}
-
-.btn-export {
-  background: var(--aia-corp-main); /* Green for Excel */
-  color: white;
-  border: 1px solid var(--aia-corp-dark);
-}
-
-.btn-export:hover {
-  background: var(--aia-corp-dark);
-}
-
-.column-checkbox input {
-  accent-color: var(--primary-color);
-}
-
-.column-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.column-actions button {
-  padding: 0.4rem 0.8rem;
-  font-size: 0.8rem;
-  border: 1px solid var(--border-color);
-  background: white;
-  border-radius: var(--radius);
-  cursor: pointer;
-}
-
-.column-actions button:hover {
-  background: #f8fafc;
-}
-
-/* Collapse/Expand Button */
-.collapse-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 2px 6px;
-  margin-right: 4px;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-.collapse-btn:hover {
-  background: var(--bg-secondary);
-  color: var(--primary-color);
-}
-
-/* Summary row with collapse icon */
-.summary-row .collapse-btn {
-  color: var(--text-secondary);
-}
-
-/* Level Selector Bar */
-.level-selector {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: white;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
-
-.level-label {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.level-btn {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
-  border: 1px solid var(--border-color);
-  background: white;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.level-btn:hover {
-  background: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
-}
-
-.level-btn-all {
-  background: #f1f5f9;
-  font-weight: 500;
-}
-
-.level-btn-all:hover {
-  background: var(--aia-corp-main);
-  border-color: var(--aia-corp-main);
-}
-
-/* Saved Projects Section */
-/* Saved Projects Section */
-.saved-projects-section {
-  margin-bottom: 0.5rem;
-}
-
-.saved-projects-section h3 {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  color: var(--text-color);
-}
-
-.project-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  /* Removed max-height/overflow to let sidebar handle scroll */
-  border: none;
-  background: transparent;
-  padding: 0;
-}
-
-.project-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1rem; /* Increase padding */
-  background: white;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  transition: all 0.2s;
-  flex-shrink: 0; /* Prevent shrinking */
-}
-
-.project-card:hover {
-  border-color: var(--primary-color);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
-
-/* Project Groups */
-.project-group {
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background: #fff;
-  /* Removed overflow: hidden to prevent clipping shadow/content */
-  margin-bottom: 0px;
-  display: flex;
-  flex-direction: column;
-}
-
-.group-header {
-  border: none;
-  background: #f1f5f9; /* Distinct header bg */
-  border-bottom: 1px solid transparent;
-  padding: 0.5rem 1rem;
-  border-radius: 0;
-}
-
-.project-group:has(.group-items:not(.hidden)) .group-header {
-  border-bottom-color: var(--border-color);
-}
-
-.group-toggle {
-  color: var(--text-muted);
-  font-size: 0.7rem;
-  padding: 0 0.5rem;
-  cursor: pointer;
-}
-
-.group-items {
-  display: flex;
-  flex-direction: column;
-}
-
-.sub-card {
-  border: none;
-  border-top: 1px solid var(--border-color);
-  border-radius: 0;
-  background: white;
-  padding-left: 2rem;
-  margin-top: 0;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.action-btn {
-  background: var(--aia-linen);
-  border: 1px solid transparent;
-  cursor: pointer;
-  padding: 0.4rem;
-  font-size: 1rem;
-  color: var(--aia-proj-main);
-  transition: all 0.2s;
-  border-radius: 6px;
-}
-
-.action-btn:hover {
-  background-color: var(--aia-proj-main);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0, 164, 153, 0.2);
-}
-
-.delete-btn {
-  background: var(--aia-linen);
-  border: 1px solid transparent;
-  cursor: pointer;
-  padding: 0.4rem;
-  font-size: 1rem;
-  color: var(
-    --aia-alert-main
-  ); /* Usamos rojo para borrar (acciones destructivas) */
-  transition: all 0.2s;
-  border-radius: 6px;
-}
-
-.delete-btn:hover {
-  background-color: var(--aia-orange);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(232, 119, 34, 0.2);
-}
-
-.sub-card:hover {
-  background: var(--aia-alabaster);
-  border-left: 3px solid var(--aia-teal); /* Indicador visual de hover */
-}
-
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(
-    26,
-    60,
-    42,
-    0.6
-  ); /* Verde oscuro corporativo semi-transparente */
-  backdrop-filter: blur(4px); /* Glassmorphism leve */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(2px);
-}
-
-.modal-content {
-  background: white;
-  padding: 1.5rem;
-  border-radius: var(--radius);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  max-width: 450px;
-  width: 90%;
-  animation: modalFadeIn 0.2s ease-out;
-}
-
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+@layer utilities {
+  .hidden {
+    display: none !important;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .text-xs {
+    font-size: 0.75rem;
+  }
+  .text-sm {
+    font-size: 0.875rem;
+  }
+  .text-muted {
+    color: var(--color-text-muted);
+  }
+
+  .flex {
+    display: flex;
+  }
+  .items-center {
+    align-items: center;
+  }
+  .justify-between {
+    justify-content: space-between;
+  }
+  .gap-2 {
+    gap: 0.5rem;
+  }
+  .gp-4 {
+    gap: 1rem;
   }
 }
 
-.modal-content h3 {
-  margin-bottom: 1rem;
-  color: var(--text-color);
-  font-size: 1.25rem;
-}
-
-.modal-content p {
-  margin-bottom: 1.5rem;
-  color: var(--text-muted);
-  line-height: 1.6;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.modal-btn {
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius);
-  border: 1px solid var(--border-color);
-  background: white;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s;
-}
-
-.modal-btn:hover {
-  background: #f1f5f9;
-}
-
-.modal-btn.primary {
-  background: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
-}
-
-.modal-btn.primary:hover {
-  background: var(--primary-hover);
-}
-
-.modal-btn.danger {
-  background: var(--aia-alert-main);
-  color: white;
-  border-color: var(--aia-alert-main);
-}
-
-/* Gantt Controls */
-.gantt-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem;
-  background: #f8fafc;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 0; /* Tight with chart */
-  border-top-left-radius: var(--radius);
-  border-top-right-radius: var(--radius);
-}
-
-.gantt-zoom-group {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.zoom-btn {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
-  border: 1px solid var(--border-color);
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.zoom-btn:hover {
-  background: var(--bg-secondary);
-}
-
-.zoom-btn.active {
-  background: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
-}
-
-.fullscreen-btn {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
-  border: 1px solid var(--border-color);
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  color: var(--text-muted);
-}
-
-.fullscreen-btn:hover {
-  color: var(--text-color);
-  background: var(--bg-secondary);
-}
-
-/* Fullscreen Mode - Reverted to Full Coverage per user request */
-.fullscreen-mode {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 9999;
-  background: white;
-  padding: 1rem;
-  border-radius: 0 !important;
-  box-sizing: border-box;
-  display: flex !important;
-  flex-direction: column;
-}
-
-/* Maximize chart area in fullscreen */
-.fullscreen-mode #gantt-chart .gantt-container {
-  height: calc(100vh - 80px) !important; /* Minimal space for controls */
-  max-height: none !important;
-  min-height: 0;
-  flex: 1;
-  overflow: auto !important;
-}
-
-/* Ensure SVG matches container logic */
-.fullscreen-mode #gantt-chart .gantt-container svg {
-  max-height: none;
-  height: auto;
-}
-
-/* Ensure scrollbars are nice */
-.fullscreen-mode ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-.fullscreen-mode ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-}
-
-/* Normal View - Increased Height */
-#gantt-chart .gantt-container {
-  height: auto !important;
-  min-height: 600px; /* Force more vertical space */
-  max-height: 85vh !important; /* Use more screen real estate */
-  overflow: auto !important;
-}
-
-/* Gantt Custom Colors */
-.bar-critical .bar {
-  fill: var(--aia-alert-main) !important; /* Red */
-}
-
-.bar-critical .bar-label {
-  fill: white !important;
-}
-
-.bar-standard .bar {
-  fill: var(--aia-corp-xlight) !important;
-  stroke: var(--aia-corp-main) !important;
-  stroke-width: 1px;
-}
-
-/* Dark text for standard bars */
-.bar-standard .bar-label {
-  fill: var(--aia-corp-dark) !important;
-  font-weight: 600;
-}
-
-/* Progress Bar - Make it extremely visible based on feedback */
-.bar-progress {
-  fill: var(--text-main) !important;
-  fill-opacity: 0.6 !important;
-  /* Removed clip-path to ensure it renders normally first */
-}
-
-/* Ensure label is visible on darker colors if needed */
-.bar-label {
-  font-weight: 500;
-}
-
-/* Labels outside bars (small class) - High contrast with background */
-.bar-label:not(.big) {
-  fill: var(--text-color) !important;
-  font-weight: 600;
-  /* Add background rectangle via filter for legibility */
-  paint-order: stroke fill;
-  stroke: white;
-  stroke-width: 3px;
-  stroke-linejoin: round;
-}
-
-/* Labels inside bars (big class) - Ensure they match bar colors */
-.bar-standard .bar-label.big {
-  fill: var(--aia-corp-dark) !important;
-  stroke: none;
-}
-
-.bar-summary .bar-label.big {
-  fill: white !important;
-  stroke: none;
-}
-
-.bar-critical .bar-label.big {
-  fill: white !important;
-  stroke: none;
-}
-
-/* High Contrast for Summary Bars - Only for INTERNAL labels */
-.bar-summary .bar-label.big {
-  fill: white !important;
-  font-weight: 600;
-  stroke: none;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); /* Ensure legibility */
-}
-
-/* Ensure Critical Bars also really pop - Only for INTERNAL labels */
-.bar-critical .bar-label.big {
-  fill: white !important;
-  font-weight: 600;
-  stroke: none;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-/* External labels for all bar types - Dark text with white outline */
-.bar-critical .bar-label.small,
-.bar-summary .bar-label.small,
-.bar-standard .bar-label.small,
-.bar-milestone .bar-label.small {
-  fill: var(--text-color) !important;
-  font-weight: 600;
-  paint-order: stroke fill;
-  stroke: white;
-  stroke-width: 3px;
-  stroke-linejoin: round;
-}
-
-/* Cutoff Line */
-.cutoff-line {
-  stroke: var(--aia-alert-main);
-  stroke-width: 2;
-  stroke-dasharray: 5, 5;
-}
-
-.cutoff-label {
-  fill: var(--aia-alert-main);
-  font-size: 12px;
-  font-weight: bold;
-}
-
-/* Milestones - Diamond Shape */
-.bar-milestone .bar {
-  fill: var(--aia-warn-main) !important; /* Amber-500 */
-  transform-box: fill-box;
-  transform-origin: center;
-  transform: rotate(45deg);
-  stroke: var(--aia-warn-dark) !important; /* Amber-700 */
-  stroke-width: 1px;
-}
-
-/* Hide progress for milestones as they are points in time */
-.bar-milestone .bar-progress {
+/* --- Gantt Popup Custom Styles --- */
+/* Hide default Frappe Gantt popup */
+.popup-wrapper {
   display: none !important;
 }
 
-/* Adjust milestone label to not overlap the diamond corners */
-.bar-milestone .bar-label {
-  fill: var(--aia-warn-dark) !important; /* Amber-900 */
-  font-weight: 700;
-  transform: translateX(10px); /* Nudge text away from diamond */
+.gantt-popup {
+  position: absolute; /* Essential for manual positioning */
+  background: white !important;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 0 !important; /* Reset frappe padding */
+  width: 260px;
+  z-index: 10000; /* High z-index */
+  font-family: var(--font-body);
+  overflow: hidden;
+  pointer-events: none; /* Prevent flickering on hover */
 }
 
-/* Ensure milestone border radius is removed to make sharp corners for diamond */
-.bar-milestone .bar {
-  rx: 0 !important;
-  ry: 0 !important;
-}
-
-/* =========================================
-   NEW LAYOUT REFACTOR (v0.4.1)
-   ========================================= */
-
-/* 1. Single Toolbar Row [GREEN] */
-.toolbar-row {
+.popup-header {
+  background: var(--aia-corp-dark);
+  color: white;
+  padding: 8px 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 1.5rem; /* Increased Side Padding */
-  background-color: var(--aia-const-mid); /* Optional background */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.toolbar-left .btn-back {
-  /* Inherit existing btn-back styles but ensure it fits */
+.popup-header h4 {
   margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 65%;
+  line-height: 1.2;
 }
 
-.toolbar-right.view-toggle {
-  /* Override existing view-toggle margins if any */
-  margin: 0;
-  display: flex;
-  gap: 0.5rem;
+.badge-critical {
+  background: var(--aia-alert-main);
+  color: white;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* 2. Compact Project Header [BLUE] */
-.project-header-compact {
-  padding: 0.5rem 1.5rem; /* Increased Side Padding */
-  background-color: white;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+.popup-body {
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
 }
 
-.project-header-compact h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: var(--aia-corp-dark);
-}
-
-.project-meta-compact {
-  font-size: 0.85rem;
-  color: #666;
+.popup-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
+  margin-bottom: 6px;
 }
 
-.meta-divider {
-  color: #ccc;
+.popup-row:last-child {
+  margin-bottom: 0;
 }
 
-/* Upload Section needs padding because container-fluid has none now */
-.upload-section {
-  padding: 2rem;
-  flex: 1; /* Ensure it takes space */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--aia-surface-mid); /* Optional background match */
+.popup-duration {
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-left: auto; /* Push to right */
 }
 
-/* 3. Maximize Workspace [YELLOW] */
-/* We need to ensure the main container fills height */
-.main-content {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden; /* Prevent body scroll */
+.popup-row.dependencies {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+  padding-top: 6px;
+  margin-top: 6px;
+  font-style: italic;
+  display: block; /* Ensure text wraps if long */
+  line-height: 1.3;
 }
 
-.container-fluid {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+.popup-progress-section {
+  margin-top: 10px;
+  background: var(--aia-alabaster);
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+.popup-progress-bar {
+  height: 6px;
+  background: var(--gray-200);
+  border-radius: 3px;
   overflow: hidden;
-  padding: 0; /* Remove padding to maximize space */
+  margin-top: 4px;
 }
 
-.results-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background-color: #f9f9f9;
+.popup-progress-fill {
+  height: 100%;
+  background: var(--aia-corp-main);
+  transition: width 0.3s ease;
 }
 
-/* View Containers must expand */
-.view-container,
-#gantt-view,
-#table-view {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-height: 0; /* Important for flex child scroll */
-}
-
-/* Gantt Controls (Level, Dates, Zoom) should be compact */
-.level-selector,
-.gantt-controls {
-  padding: 0.5rem 1.5rem; /* Increased side padding */
-  background: #fff;
-  border-bottom: 1px solid #eee;
-  flex-shrink: 0;
-}
-
-/* The actual chart area */
-/* The actual chart area */
-#gantt-chart {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* Parent clips */
-  min-height: 0;
-  /* Add padding to the wrapper so content isn't flush */
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-
-.gantt-container {
-  flex: 1;
-  overflow: auto; /* It scrolls */
-  height: 100% !important; /* Force fill */
-  width: 100%;
-  max-height: none !important;
-}
-
-/* Hide footer to maximize space? User didn't explicitly say hide footer but "Maximize space" usually implies it. 
-   Let's keep it minimal or hide it. Image didn't show footer either. 
-   Let's compact it. */
-.app-footer {
-  padding: 0.5rem 1.5rem;
-  font-size: 0.7rem;
-  background: #f1f1f1;
+.popup-row.theoretical {
+  margin-top: 4px;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  justify-content: flex-end;
 }

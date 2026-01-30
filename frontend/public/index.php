@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visor MPP</title>
     <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
@@ -35,6 +35,7 @@
         <div class="main-content">
             <!-- Top Bar with Logo -->
             <header class="main-top-bar">
+                <button id="toggle-sidebar-mobile" class="icon-btn mobile-hamburger-btn" aria-label="Abrir menú" style="color: var(--color-text-main); font-size: 1.5rem;">☰</button>
                 <div id="top-bar-actions" class="top-bar-actions">
                     <!-- Dynamic Actions Injected Here -->
                 </div>
@@ -42,6 +43,8 @@
                     <img src="logo.png" alt="AIA">
                 </a>
             </header>
+
+            <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
             <main class="container-fluid">
                 <section class="upload-section">
@@ -89,7 +92,7 @@
     <!-- SortableJS (Drag & Drop) -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>

@@ -11,8 +11,13 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 - **Favicon y Logo Corporativo**: Integración de `favicon.png` y `logo.png` en la interfaz principal.
 - **Curvas Suaves en Flechas de Dependencias**: Implementación de curvas bezier (radio 8px) para paths SVG de dependencias, mejorando la estética visual.
+- **Hitos Críticos Visibles**: Solución definitiva para visualizar hitos de ruta crítica como rombos rojos perfectos, corrigiendo errores de recorte y conflictos de clases en la librería.
+- **Popups Personalizados**: Nueva implementación manual de tooltips (bypass de librería) que muestra atributos clave (Desviación, Predecesoras, Estado Crítico) con diseño Mobile First.
 
 ### Changed
+
+- **Cache Busting**: Implementación de versionado dinámico en assets CSS/JS para forzar la recarga de cambios en el navegador.
+- **Etiquetas de Gantt**: Cambio de etiqueta "Dedv" a "Desv" (Desviación) para mayor claridad.
 
 - **Refactorización de Renderizado**: Simplificación de lógica de `renderTable` y `renderGantt` para mayor mantenibilidad.
 - **Top Bar Mejorado**: Refinamiento de estilos del `main-top-bar` con mejor alineación y espaciado utilizando flexbox y gap.
