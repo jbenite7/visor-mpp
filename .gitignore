@@ -6,3 +6,4 @@ node_modules/
 backend/debug_log.txt
 backend/uploads/*
 !backend/uploads/.gitkeep
+*_backup
